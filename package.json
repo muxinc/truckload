@@ -1,0 +1,33 @@
+{
+  "name": "template-mux-nextjs",
+  "description": "Wanna build a Next.js app at Mux? Starting here's not a bad idea.",
+  "version": "1.0.0",
+  "author": "Mux DevEx <devex@mux.com>",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "prettier --check ./ && next lint",
+    "format": "prettier --write ./ && next lint --fix",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.1.1",
+    "@types/node": "20.4.2",
+    "@types/react": "18.2.15",
+    "@types/react-dom": "18.2.7",
+    "eslint": "8.45.0",
+    "eslint-config-next": "13.4.10",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "husky": "^8.0.3",
+    "next": "13.4.10",
+    "prettier": "2",
+    "pretty-quick": "^3.1.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.1.6"
+  }
+}

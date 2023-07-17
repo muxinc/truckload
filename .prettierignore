@@ -1,0 +1,8 @@
+.next
+.vscode
+.github
+.cache
+.vercel
+.husky
+node_modules
+public
