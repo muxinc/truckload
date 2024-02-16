@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { Aeonik } from '@/_fonts';
+import '@/_styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Mux',
@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
-      <body className={Aeonik.className}>{children}</body>
+      <body className="p-4 font-sans">{children}</body>
     </html>
   );
 }

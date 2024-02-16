@@ -1,3 +1,4 @@
+import { Sriracha } from 'next/font/google';
 import localFont from 'next/font/local';
 
 export const Aeonik = localFont({
@@ -24,4 +25,11 @@ export const JetBrainsMono = localFont({
   src: './JetBrains/JetBrainsMono-Regular.woff2',
   display: 'swap',
   fallback: ['monaco', 'monospace'],
+});
+
+export const sriracha = Sriracha({
+  weight: '400',
+  display: 'swap',
+  subsets: ['latin'],
+  fallback: ['cursive'],
 });
