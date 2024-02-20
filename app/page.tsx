@@ -46,7 +46,10 @@ export default async function Page() {
         </div>
       </div>
 
-      <div className="flex justify-end absolute right-0 bottom-0">
+      <div
+        className="flex justify-end absolute right-0 bottom-0 left-0 bg-repeat-x bg-contain"
+        style={{ backgroundImage: 'url(/tree.png)' }}
+      >
         <button className="text-2xl bg-primary text-white py-2 px-5 font-semibold">Place order</button>
       </div>
 

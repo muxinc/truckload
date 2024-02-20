@@ -22,7 +22,7 @@ export default function SourcePlatformCredentialsForm() {
   return (
     <div className="my-4 max-w-lg">
       <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>Credentials</h2>
-      <p className="text-xs">Enter your credentials</p>
+      <p className="text-xs">Never stored. Encrypted in transit.</p>
 
       {SOURCE_PLATFORM_CREDENTIALS.map((platform) => (
         <div>
