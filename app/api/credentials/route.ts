@@ -1,5 +1,7 @@
 import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
 
+import Mux from '@mux/mux-node';
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
@@ -25,8 +27,17 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Invalid credentials' }, { status: 401 });
       }
     case 'mux':
-      // Do something with Mux
-      return Response.json({ error: 'This provider is not yet supported' }, { status: 501 });
+      const mux = new Mux({
+        tokenId: data.publicKey as string,
+        tokenSecret: data.secretKey as string,
+      });
+
+      try {
+        await mux.video.assets.list();
+        return new Response('ok', { status: 200 });
+      } catch (error) {
+        return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+      }
     default:
       return Response.json({ error: 'Invalid platform provided' }, { status: 404 });
   }
