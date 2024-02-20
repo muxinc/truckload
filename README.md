@@ -9,3 +9,9 @@
 ### Run local Inngest server
 
 `npx inngest-cli@latest dev`
+
+## Resources
+
+### AWS SDK v3 API reference
+
+https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/

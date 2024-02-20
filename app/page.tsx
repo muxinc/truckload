@@ -1,48 +1,48 @@
+'use client';
+
+import { Toaster } from 'react-hot-toast';
+
 import Image from 'next/image';
 
-import { GetObjectCommand, ListBucketsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+// import { GetObjectCommand, ListBucketsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+// import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import PlatformCredentialsForm from './components/platforms/credentials-form';
+import PlatformList from './components/platforms/platform-list';
+import useMigrationStore from './utils/store';
 
-import { sriracha } from '@/_fonts';
+// const client = new S3Client({
+//   credentials: {
+//     accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
+//     secretAccessKey: process.env.S3_SECRET_ACCESS as string,
+//   },
+//   region: 'us-east-1',
+// });
 
-import SourcePlatformCredentialsForm from './components/platforms/credentials-form';
-import DestinationPlatformList from './components/platforms/destination-platform-list';
-import ListBuckets from './components/platforms/s3/list-buckets';
-import SourcePlatformList from './components/platforms/source-platform-list';
-import SourcePlatformProvider from './context/source-platform';
+export default function Page() {
+  // const listObjects = new ListObjectsV2Command({ Bucket: 'dk-videos-bucket' });
+  // const r2 = await client.send(listObjects);
 
-const client = new S3Client({
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.S3_SECRET_ACCESS as string,
-  },
-  region: 'us-east-1',
-});
+  // const object = new GetObjectCommand({ Bucket: 'dk-videos-bucket', Key: 'hackweek-mux-video-ad-final.mp4' });
+  // const url = await getSignedUrl(client, object, { expiresIn: 3600 });
 
-export default async function Page() {
-  const listObjects = new ListObjectsV2Command({ Bucket: 'dk-videos-bucket' });
-  const r2 = await client.send(listObjects);
-
-  const object = new GetObjectCommand({ Bucket: 'dk-videos-bucket', Key: 'hackweek-mux-video-ad-final.mp4' });
-  const url = await getSignedUrl(client, object, { expiresIn: 3600 });
+  const sourcePlatform = useMigrationStore((state) => state.sourcePlatform);
+  const destinationPlatform = useMigrationStore((state) => state.destinationPlatform);
 
   return (
-    <SourcePlatformProvider>
+    <>
       <div className="border-b-8 border-double mb-8 border-primary">
         <Image src="/in-n-out-video.png" alt="In-n-out Video" width={200} height={100} className="mb-4" />
       </div>
 
-      {/* <h1 className={`text-primary font-bold text-3xl uppercase`}>In-n-out Video</h1> */}
-
       <div className="grid grid-cols-2">
         <div>
-          <SourcePlatformList />
-          <SourcePlatformCredentialsForm />
+          <PlatformList type="source" />
+          {sourcePlatform && <PlatformCredentialsForm platformId={sourcePlatform.id} />}
         </div>
 
         <div>
-          <DestinationPlatformList />
-          <SourcePlatformCredentialsForm />
+          <PlatformList type="destination" />
+          {destinationPlatform && <PlatformCredentialsForm platformId={destinationPlatform.id} />}
         </div>
       </div>
 
@@ -52,6 +52,8 @@ export default async function Page() {
       >
         <button className="text-2xl bg-primary text-white py-2 px-5 font-semibold">Place order</button>
       </div>
+
+      <Toaster />
 
       {/* <p>Select a bucket</p>
       <ListBuckets />
@@ -66,6 +68,6 @@ export default async function Page() {
           <p>{object.Size}</p>
         </>
       ))} */}
-    </SourcePlatformProvider>
+    </>
   );
 }
