@@ -1,4 +1,4 @@
-import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
+import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 
 import Mux from '@mux/mux-node';
 
@@ -17,7 +17,11 @@ export async function POST(request: Request) {
         region: data.region,
       });
 
-      const command = new ListBucketsCommand({});
+      const input = {
+        Bucket: data.bucket,
+      };
+
+      const command = new HeadBucketCommand(input);
 
       try {
         await client.send(command);

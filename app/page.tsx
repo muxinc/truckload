@@ -8,6 +8,7 @@ import Image from 'next/image';
 // import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import PlatformCredentialsForm from './components/platforms/credentials-form';
 import PlatformList from './components/platforms/platform-list';
+import VideoFilter from './components/platforms/video-filter';
 import useMigrationStore from './utils/store';
 
 // const client = new S3Client({
@@ -21,7 +22,6 @@ import useMigrationStore from './utils/store';
 export default function Page() {
   // const listObjects = new ListObjectsV2Command({ Bucket: 'dk-videos-bucket' });
   // const r2 = await client.send(listObjects);
-
   // const object = new GetObjectCommand({ Bucket: 'dk-videos-bucket', Key: 'hackweek-mux-video-ad-final.mp4' });
   // const url = await getSignedUrl(client, object, { expiresIn: 3600 });
 
@@ -38,6 +38,7 @@ export default function Page() {
         <div>
           <PlatformList type="source" />
           {sourcePlatform && <PlatformCredentialsForm platformId={sourcePlatform.id} />}
+          {sourcePlatform && <VideoFilter />}
         </div>
 
         <div>

@@ -2,8 +2,6 @@ import toast from 'react-hot-toast';
 
 import { sriracha } from '@/_fonts';
 
-const invalidCredentialsToast = () => toast('Invalid credentials, try again', { icon: '❌' });
-
 const PLATFORM_CREDENTIALS = [
   {
     name: 'Amazon S3',
@@ -34,6 +32,11 @@ const PLATFORM_CREDENTIALS = [
           'ap-northeast-1',
           'sa-east-1',
         ],
+      },
+      {
+        label: 'Bucket name',
+        name: 'bucket',
+        type: 'text',
       },
     ],
   },
@@ -73,10 +76,12 @@ export default function PlatformCredentialsForm({ platformId }: { platformId: st
     });
 
     if (result.status === 401) {
-      invalidCredentialsToast();
+      toast('Invalid credentials, try again', { icon: '❌' });
     }
 
-    console.log(result);
+    if (result.status === 200) {
+      toast('Credentials validated', { icon: '👍' });
+    }
   };
 
   return (
