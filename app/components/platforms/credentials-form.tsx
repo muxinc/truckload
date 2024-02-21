@@ -1,6 +1,8 @@
 import toast from 'react-hot-toast';
 
 import { sriracha } from '@/_fonts';
+import useMigrationStore from '@/utils/store';
+import type { PlatformCredentials } from '@/utils/store';
 
 const PLATFORM_CREDENTIALS = [
   {
@@ -58,17 +60,28 @@ const PLATFORM_CREDENTIALS = [
   },
 ];
 
-export default function PlatformCredentialsForm({ platformId }: { platformId: string }) {
-  const platform = PLATFORM_CREDENTIALS.find((p) => p.id === platformId);
+export default function PlatformCredentialsForm() {
+  const { currentStep, setCurrentStep, platform, setPlatform } = useMigrationStore((state) => ({
+    currentStep: state.currentStep,
+    setCurrentStep: state.setCurrentStep,
+    setPlatform: state.setPlatform,
+    platform: state.currentStep === 'set-source-credentials' ? state.sourcePlatform : state.destinationPlatform,
+  }));
+
   if (!platform) {
+    return null;
+  }
+
+  const platformCreds = PLATFORM_CREDENTIALS.find((p) => p.id === platform?.id);
+  if (!platformCreds) {
     return null;
   }
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    console.log(data);
+    const rawData = Object.fromEntries(formData.entries());
+    const data: PlatformCredentials = rawData as unknown as PlatformCredentials;
 
     const result = await fetch('/api/credentials', {
       method: 'POST',
@@ -80,37 +93,50 @@ export default function PlatformCredentialsForm({ platformId }: { platformId: st
     }
 
     if (result.status === 200) {
+      setPlatform(platform.type, { ...platform, credentials: data });
+      if (currentStep === 'set-source-credentials') {
+        setCurrentStep('select-video-filter');
+      } else {
+        setCurrentStep('set-destination-metadata');
+      }
+
       toast('Credentials validated', { icon: '👍' });
     }
   };
 
   return (
-    <div className="my-4 max-w-lg">
-      <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>Add your credentials</h2>
-      <p className="text-xs">Never stored. Encrypted in transit.</p>
+    <div className="max-w-lg">
+      <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>
+        Add your {platform.name} credentials
+      </h2>
+      <p className="text-xs">Only stored locally. Encrypted in transit.</p>
 
       <form onSubmit={onSubmit}>
-        {platform.values.map((value) => (
+        <input type="hidden" name="platformId" value={platform?.id} />
+
+        {platformCreds.values.map((value) => (
           <div key={value.name} className="my-3">
-            <input type="hidden" name="platformId" value={platformId} />
             <label htmlFor={value.name} className="block text-sm font-medium leading-6 text-gray-900">
               {value.label}
             </label>
+
             <div className="mt-2">
               {value.type === 'text' && (
                 <input
                   id={value.name}
                   name={value.name}
                   type="text"
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  required
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
 
               {value.type === 'select' && (
                 <select
+                  required
                   id={value.name}
                   name={value.name}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 >
                   {value.values?.map((v) => (
                     <option key={v} value={v}>

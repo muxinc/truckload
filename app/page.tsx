@@ -9,6 +9,8 @@ import Image from 'next/image';
 import PlatformCredentialsForm from './components/platforms/credentials-form';
 import PlatformList from './components/platforms/platform-list';
 import VideoFilter from './components/platforms/video-filter';
+import DestinationMetadata from './components/shared/destination-metadata';
+import Sidebar from './components/sidebar';
 import useMigrationStore from './utils/store';
 
 // const client = new S3Client({
@@ -27,6 +29,7 @@ export default function Page() {
 
   const sourcePlatform = useMigrationStore((state) => state.sourcePlatform);
   const destinationPlatform = useMigrationStore((state) => state.destinationPlatform);
+  const currentStep = useMigrationStore((state) => state.currentStep);
 
   return (
     <>
@@ -34,25 +37,23 @@ export default function Page() {
         <Image src="/in-n-out-video.png" alt="In-n-out Video" width={200} height={100} className="mb-4" />
       </div>
 
-      <div className="grid grid-cols-2">
-        <div>
-          <PlatformList type="source" />
-          {sourcePlatform && <PlatformCredentialsForm platformId={sourcePlatform.id} />}
-          {sourcePlatform && <VideoFilter />}
-        </div>
+      <div className="grid grid-cols-2 gap-10" style={{ gridTemplateColumns: `320px 1fr` }}>
+        <Sidebar />
 
         <div>
-          <PlatformList type="destination" />
-          {destinationPlatform && <PlatformCredentialsForm platformId={destinationPlatform.id} />}
+          {currentStep === 'select-source' && <PlatformList type="source" />}
+          {currentStep === 'set-source-credentials' && sourcePlatform && <PlatformCredentialsForm />}
+          {currentStep === 'select-video-filter' && <VideoFilter />}
+          {currentStep === 'select-destination' && <PlatformList type="destination" />}
+          {currentStep === 'set-destination-credentials' && destinationPlatform && <PlatformCredentialsForm />}
+          {currentStep === 'set-destination-metadata' && <DestinationMetadata />}
         </div>
       </div>
 
       <div
-        className="flex justify-end absolute right-0 bottom-0 left-0 bg-repeat-x bg-contain"
+        className="flex justify-end absolute right-0 bottom-0 left-0 bg-repeat-x bg-contain h-12"
         style={{ backgroundImage: 'url(/tree.png)' }}
-      >
-        <button className="text-2xl bg-primary text-white py-2 px-5 font-semibold">Place order</button>
-      </div>
+      ></div>
 
       <Toaster />
 

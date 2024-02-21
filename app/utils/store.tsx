@@ -10,18 +10,18 @@ type PlatformCredentialsMetadata = {
   [key: string]: string;
 };
 
-type PlatformCredentials = {
+export type PlatformCredentials = {
   publicKeyId: string;
   secretKeyId?: string | undefined;
   additionalMetadata?: PlatformCredentialsMetadata | undefined;
 };
 
-interface SourcePlatform extends Platform {
+export interface SourcePlatform extends Platform {
   id: 's3';
   type: 'source';
 }
 
-interface DestinationPlatform extends Platform {
+export interface DestinationPlatform extends Platform {
   id: 'mux';
   type: 'destination';
 }
@@ -29,16 +29,38 @@ interface DestinationPlatform extends Platform {
 type PlatformType = 'source' | 'destination';
 
 interface Platform {
-  id: string;
-  type: PlatformType;
+  name: string;
+  logo: () => JSX.Element;
   credentials?: PlatformCredentials | undefined;
 }
+
+export type AssetFilter = {
+  url: string;
+};
 
 interface MigrationState {
   sourcePlatform: SourcePlatform | null;
   destinationPlatform: DestinationPlatform | null;
-  setPlatform: (type: PlatformType, platform: Platform) => void;
+  assetFilter: AssetFilter[] | null;
+  setAssetFilter: (filter: AssetFilter[] | null) => void;
+  setPlatform: <T extends PlatformType>(
+    type: T,
+    platform: T extends 'source' ? SourcePlatform | null : DestinationPlatform | null
+  ) => void;
+  currentStep: MigrationStep;
+  setCurrentStep: (step: MigrationStep) => void;
 }
+
+type MigrationStep =
+  | 'select-source'
+  | 'set-source-credentials'
+  | 'select-video-filter'
+  | 'select-videos'
+  | 'select-destination'
+  | 'set-destination-credentials'
+  | 'set-destination-metadata'
+  | 'review'
+  | 'status';
 
 const useMigrationStore = create<MigrationState>()(
   devtools(
@@ -46,11 +68,22 @@ const useMigrationStore = create<MigrationState>()(
       (set) => ({
         sourcePlatform: null,
         destinationPlatform: null,
-        setPlatform: (type: PlatformType, platform: Platform) => {
+        assetFilter: null,
+        currentStep: 'select-source',
+        setCurrentStep: (step: MigrationStep) => {
+          set({ currentStep: step });
+        },
+        setAssetFilter: (filter: AssetFilter[] | null) => {
+          set({ assetFilter: filter });
+        },
+        setPlatform: <T extends PlatformType>(
+          type: T,
+          platform: T extends 'source' ? SourcePlatform | null : DestinationPlatform | null
+        ) => {
           if (type === 'source') {
-            set({ sourcePlatform: platform as SourcePlatform });
-          } else {
-            set({ destinationPlatform: platform as DestinationPlatform });
+            set({ sourcePlatform: platform as SourcePlatform | null });
+          } else if (type === 'destination') {
+            set({ destinationPlatform: platform as DestinationPlatform | null });
           }
         },
       }),
