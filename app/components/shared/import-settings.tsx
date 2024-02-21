@@ -1,5 +1,6 @@
 import { sriracha } from '@/_fonts';
 import useMigrationStore from '@/utils/store';
+import type { PlatformConfig } from '@/utils/store';
 
 const PLATFORM_METADATA_FIELDS = [
   {
@@ -35,11 +36,28 @@ const PLATFORM_METADATA_FIELDS = [
 export default function DestinationMetadata() {
   const destinationPlatform = useMigrationStore((state) => state.destinationPlatform);
   const setPlatform = useMigrationStore((state) => state.setPlatform);
+  const setCurrentStep = useMigrationStore((state) => state.setCurrentStep);
+  const platform = useMigrationStore((state) =>
+    state.currentStep === 'set-import-settings' ? state.destinationPlatform : state.sourcePlatform
+  );
+
+  if (!platform) {
+    return null;
+  }
 
   const platformFields = PLATFORM_METADATA_FIELDS.find((field) => field.id === destinationPlatform?.id);
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const rawData = Object.fromEntries(formData.entries());
+    const data: PlatformConfig = rawData as unknown as PlatformConfig;
+    setPlatform(platform.type, { ...platform, config: data });
+    setCurrentStep('review');
+  };
+
   return (
-    <form>
+    <form onSubmit={onSubmit}>
       <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>Choose your import settings</h2>
 
       <div className="flex flex-col gap-4 mb-10">

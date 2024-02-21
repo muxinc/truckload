@@ -95,9 +95,9 @@ export default function PlatformCredentialsForm() {
     if (result.status === 200) {
       setPlatform(platform.type, { ...platform, credentials: data });
       if (currentStep === 'set-source-credentials') {
-        setCurrentStep('select-video-filter');
+        setCurrentStep('set-video-filter');
       } else {
-        setCurrentStep('set-destination-metadata');
+        setCurrentStep('set-import-settings');
       }
 
       toast('Credentials validated', { icon: '👍' });

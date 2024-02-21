@@ -1,4 +1,6 @@
-import { sriracha } from '@/_fonts';
+import toast from 'react-hot-toast';
+
+import Banner from '@/components/banner';
 import useMigrationStore from '@/utils/store';
 
 export default function Sidebar() {
@@ -10,11 +12,35 @@ export default function Sidebar() {
   const assetFilter = useMigrationStore((state) => state.assetFilter);
   const setAssetFilter = useMigrationStore((state) => state.setAssetFilter);
 
+  const onSubmit = async () => {
+    console.log({ sourcePlatform, destinationPlatform, assetFilter });
+    const result = await fetch('/api/job', {
+      method: 'POST',
+      body: JSON.stringify({ sourcePlatform, destinationPlatform, assetFilter }),
+    });
+
+    if (result.status === 201) {
+      const { id } = await result.json();
+      // useMigrationStore.setState({ job: { id } });
+
+      setCurrentStep('migration-status');
+      toast('Migration initiated', { icon: '👍' });
+    } else {
+      toast.error('Error initiating migration');
+    }
+  };
+
   return (
     <div className="relative border-2 border-slate-200 rounded shadow-xl p-4">
-      <h2 className={`text-primary uppercase font-bold text-lg mb-4 ${sriracha.className}`}>Order summary</h2>
+      <Banner>Order summary</Banner>
 
       <div className="flex flex-col gap-4 mb-10">
+        {!sourcePlatform && (
+          <div>
+            <p>Start over there ➡️</p>
+          </div>
+        )}
+
         {sourcePlatform && (
           <div className="flex justify-between border-b border-slate-200 pb-2">
             <div className="flex flex-col">
@@ -61,7 +87,7 @@ export default function Sidebar() {
             <button
               onClick={() => {
                 setAssetFilter(null);
-                setCurrentStep('select-video-filter');
+                setCurrentStep('set-video-filter');
               }}
             >
               ❌
@@ -104,13 +130,35 @@ export default function Sidebar() {
             </button>
           </div>
         )}
+
+        {destinationPlatform?.config && (
+          <div className="flex justify-between border-b border-slate-200 pb-2">
+            <div className="flex flex-col">
+              <h3 className="font-semibold text-sm">Import settings</h3>
+              <p className="text-sm">Settings added</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setPlatform('destination', { ...destinationPlatform, config: undefined });
+                setCurrentStep('set-import-settings');
+              }}
+            >
+              ❌
+            </button>
+          </div>
+        )}
       </div>
-      <button
-        className="text-2xl bg-primary text-white py-2 px-5 font-semibold disabled:bg-gray-300"
-        disabled={currentStep !== 'review'}
-      >
-        Place order
-      </button>
+
+      {currentStep === 'review' && (
+        <button
+          className="text-2xl bg-primary text-white py-2 px-5 font-semibold disabled:bg-gray-300"
+          disabled={currentStep !== 'review'}
+          onClick={onSubmit}
+        >
+          Place order
+        </button>
+      )}
     </div>
   );
 }
