@@ -81,11 +81,12 @@ export default function PlatformCredentialsForm() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const rawData = Object.fromEntries(formData.entries());
-    const data: PlatformCredentials = rawData as unknown as PlatformCredentials;
+    const { publicKey, secretKey, ...additionalMetadata } = rawData as unknown as Record<string, string>;
+    const data: PlatformCredentials = { publicKey, secretKey, additionalMetadata };
 
     const result = await fetch('/api/credentials', {
       method: 'POST',
-      body: JSON.stringify({ data }),
+      body: JSON.stringify(data),
     });
 
     if (result.status === 401) {

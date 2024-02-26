@@ -2,23 +2,25 @@ import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 
 import Mux from '@mux/mux-node';
 
+import type { PlatformCredentials } from '@/utils/store';
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const { data } = await request.json();
+  const data: PlatformCredentials = await request.json();
 
-  switch (data.platformId) {
+  switch (data.additionalMetadata?.platformId) {
     case 's3':
       const client = new S3Client({
         credentials: {
-          accessKeyId: data.publicKey as string,
-          secretAccessKey: data.secretKey as string,
+          accessKeyId: data.publicKey,
+          secretAccessKey: data.secretKey!,
         },
-        region: data.region,
+        region: data.additionalMetadata.region,
       });
 
       const input = {
-        Bucket: data.bucket,
+        Bucket: data.additionalMetadata.bucket,
       };
 
       const command = new HeadBucketCommand(input);

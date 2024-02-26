@@ -1,5 +1,7 @@
 # In-n-out Video
 
+<img src="public/in-n-out-video.png" alt="In-n-out Video" width="200px">
+
 ## How to use
 
 ### Start development server

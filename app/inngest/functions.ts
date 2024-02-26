@@ -1,21 +1,16 @@
 import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import type { GetEvents } from 'inngest';
 
 import Mux from '@mux/mux-node';
 
+import type { Video } from './client';
 import { inngest } from './client';
 
-export const helloWorld = inngest.createFunction(
-  { id: 'hello-world' },
-  { event: 'test/hello.world' },
-  async ({ event, step }) => {
-    await step.sleep('wait-a-moment', '1s');
-    return { event, body: 'Hello, World!' };
-  }
-);
+type Events = GetEvents<typeof inngest>;
 
-const fetchPage = inngest.createFunction(
-  { id: 'fetch-page', name: 'Fetch page' },
+export const fetchPage = inngest.createFunction(
+  { id: 'fetch-page', name: 'Fetch page', concurrency: 1 },
   { event: 'in-n-out/migration.fetch-page' },
   async ({ event, step }) => {
     const client = new S3Client({
@@ -31,16 +26,16 @@ const fetchPage = inngest.createFunction(
 
     const isTruncated = results.IsTruncated;
     const cursor = results.NextContinuationToken;
-    const videos = results.Contents?.map((object) => object.Key);
-
+    const videos =
+      results.Contents?.map((object) => ({ id: object.Key })).filter((item): item is Video => !!item.id) || [];
     const payload = { isTruncated, cursor, videos };
     return payload;
   }
 );
 
-const fetchVideo = inngest.createFunction(
-  { id: 'fetch-video', name: 'Fetch video' },
-  { event: 'in-n-out/migration.fetch-video' },
+export const fetchVideo = inngest.createFunction(
+  { id: 'fetch-video', name: 'Fetch video', concurrency: 10 },
+  { event: 'in-n-out/video.fetch' },
   async ({ event, step }) => {
     const client = new S3Client({
       credentials: {
@@ -55,8 +50,13 @@ const fetchVideo = inngest.createFunction(
       Key: event.data.encrypted.video.id, //'hackweek-mux-video-ad-final.mp4'
     });
 
-    const video = await getSignedUrl(client, object, { expiresIn: 3600 });
-    return { video };
+    const url = await getSignedUrl(client, object, { expiresIn: 3600 });
+    const video = {
+      id: event.data.encrypted.video.id,
+      url,
+    };
+
+    return video;
   }
 );
 
@@ -65,42 +65,45 @@ const fetchVideo = inngest.createFunction(
 // This also allows the system to define different configuration for each part,
 // like limits on concurrency for how many videos should be copied in parallel
 // A separate function could be created for each destination platform
-const transferVideo = inngest.createFunction(
+export const transferVideo = inngest.createFunction(
   { id: 'transfer-video', name: 'Transfer video', concurrency: 10 },
-  { event: 'app/transfer.initiated' },
+  { event: 'in-n-out/video.transfer' },
   async ({ event, step }) => {
     const mux = new Mux({
-      tokenId: event.data.encrypted.destinationPlatform.credentials.publicKey as string,
-      tokenSecret: event.data.encrypted.destinationPlatform.credentials.secretKey as string,
+      tokenId: event.data.encrypted.destinationPlatform.credentials!.publicKey,
+      tokenSecret: event.data.encrypted.destinationPlatform.credentials!.secretKey,
     });
 
-    const result = await mux.video.assets.create({ input: [] });
+    const result = await mux.video.assets.create({ input: [{ url: event.data.encrypted.video.url }] });
     // #6 - Option A - Could add pushing updates to the browser with something like Websockets
     return { status: 'success', result };
   }
 );
 
 export const processVideo = inngest.createFunction(
-  { id: 'process-video' },
+  { id: 'process-video', name: 'Process video' },
   { event: 'in-n-out/video.process' },
   async ({ event, step }) => {
-    const videoData = event.data.video;
+    const videoData = event.data.encrypted.video;
 
     const video = await step.invoke(`fetch-video-${videoData.id}`, {
       function: fetchVideo,
       data: {
-        videoData,
-        destinationPlatform: event.data.destinationPlatform,
-        settings: event.data.settings,
+        encrypted: {
+          credentials: event.data.encrypted.sourcePlatform.credentials!,
+          video: videoData,
+        },
       },
     });
 
     const transfer = await step.invoke(`transfer-video-${videoData.id}`, {
       function: transferVideo,
       data: {
-        video,
-        destinationPlatform: event.data.destinationPlatform,
-        settings: event.data.settings,
+        encrypted: {
+          sourcePlatform: event.data.encrypted.sourcePlatform,
+          destinationPlatform: event.data.encrypted.destinationPlatform,
+          video,
+        },
       },
     });
 
@@ -112,30 +115,47 @@ export const initiateMigration = inngest.createFunction(
   { id: 'initiate-migration' },
   { event: 'in-n-out/migration.init' },
   async ({ event, step }) => {
+    let jobId = event.id;
     let hasMorePages = true;
     let page = 1;
-    let nextPageNumber;
-    let nextPageToken;
-    let videoList = [];
+    let nextPageNumber: number | undefined = undefined;
+    let nextPageToken: string | undefined = undefined;
+    let videoList: Video[] = [];
+
+    console.log('jobId: ' + jobId);
+
+    // todo: use this to conditionally set the fetch page function
     let sourcePlatformId = event.data.encrypted.sourcePlatform.id;
 
-    while (hasMorePages) {
-      const { cursor, isTruncated, videos } = step.invoke(`fetch-page-${page}`, {
+    while (hasMorePages && event.data.encrypted.sourcePlatform.credentials) {
+      const { cursor, isTruncated, videos } = await step.invoke(`fetch-page-${page}`, {
         function: fetchPage,
-        data: event.data.encrypted,
+        data: {
+          encrypted: event.data.encrypted.sourcePlatform.credentials,
+        },
       });
 
       videoList = videoList.concat(videos);
       nextPageToken = cursor;
+
+      console.log('page: ' + page);
+      console.log('cursor: ' + cursor);
+      console.log('isTruncated: ' + isTruncated);
+      console.log('videos: ' + JSON.stringify(videos));
+
       if (!isTruncated) {
         hasMorePages = false;
       }
     }
 
-    const videoEvents = videoList.map((video) => ({
+    const videoEvents = videoList.map((video): Events['in-n-out/video.process'] => ({
       name: 'in-n-out/video.process',
       data: {
-        video,
+        encrypted: {
+          sourcePlatform: event.data.encrypted.sourcePlatform,
+          destinationPlatform: event.data.encrypted.destinationPlatform,
+          video,
+        },
       },
     }));
 

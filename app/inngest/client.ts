@@ -3,8 +3,9 @@ import { EventSchemas, Inngest } from 'inngest';
 
 import type { AssetFilter, DestinationPlatform, PlatformCredentials, SourcePlatform } from '@/utils/store';
 
-type Video = {
+export type Video = {
   id: string;
+  url?: string | undefined;
 };
 
 type FetchVideo = {
@@ -22,6 +23,16 @@ type FetchPage = {
   };
 };
 
+type ProcessVideo = {
+  data: {
+    encrypted: {
+      sourcePlatform: SourcePlatform;
+      destinationPlatform: DestinationPlatform;
+      video: Video;
+    };
+  };
+};
+
 type InitMigration = {
   data: {
     encrypted: {
@@ -35,7 +46,9 @@ type InitMigration = {
 type Events = {
   'in-n-out/migration.init': InitMigration;
   'in-n-out/migration.fetch-page': FetchPage;
-  'in-n-out/migration.fetch-video': FetchVideo;
+  'in-n-out/video.process': ProcessVideo;
+  'in-n-out/video.fetch': FetchVideo;
+  'in-n-out/video.transfer': ProcessVideo;
 };
 
 const mw = encryptionMiddleware({
