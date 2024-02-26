@@ -11,8 +11,8 @@ type PlatformCredentialsMetadata = {
 };
 
 export type PlatformCredentials = {
-  publicKeyId: string;
-  secretKeyId?: string | undefined;
+  publicKey: string;
+  secretKey?: string | undefined;
   additionalMetadata?: PlatformCredentialsMetadata | undefined;
 };
 

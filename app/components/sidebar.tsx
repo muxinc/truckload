@@ -34,7 +34,7 @@ export default function Sidebar() {
     <div className="relative border-2 border-slate-200 rounded shadow-xl p-4">
       <Banner>Order summary</Banner>
 
-      <div className="flex flex-col gap-4 mb-10">
+      <div className="flex flex-col gap-4 mt-10 mb-16">
         {!sourcePlatform && (
           <div>
             <p>Start over there ➡️</p>
@@ -152,7 +152,7 @@ export default function Sidebar() {
 
       {currentStep === 'review' && (
         <button
-          className="text-2xl bg-primary text-white py-2 px-5 font-semibold disabled:bg-gray-300"
+          className="font-sans uppercase rounded text-base bg-primary text-white py-4 px-8 font-semibold disabled:bg-gray-300 w-full"
           disabled={currentStep !== 'review'}
           onClick={onSubmit}
         >
