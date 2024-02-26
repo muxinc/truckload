@@ -3,6 +3,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { GetEvents } from 'inngest';
 
 import Mux from '@mux/mux-node';
+import { PlaybackPolicy } from '@mux/mux-node/resources';
 
 import type { Video } from './client';
 import { inngest } from './client';
@@ -74,7 +75,25 @@ export const transferVideo = inngest.createFunction(
       tokenSecret: event.data.encrypted.destinationPlatform.credentials!.secretKey,
     });
 
-    const result = await mux.video.assets.create({ input: [{ url: event.data.encrypted.video.url }] });
+    const config = event.data.encrypted.destinationPlatform.config;
+
+    let payload: Mux.Video.Assets.AssetCreateParams = {
+      input: [{ url: event.data.encrypted.video.url }],
+    };
+
+    if (config?.maxResolutionTier) {
+      payload = { ...payload, max_resolution_tier: config.maxResolutionTier as any };
+    }
+
+    if (config?.playbackPolicy) {
+      payload = { ...payload, playback_policy: [config.playbackPolicy as PlaybackPolicy] };
+    }
+
+    if (config?.encodingTier) {
+      payload = { ...payload, encoding_tier: config.encodingTier as any };
+    }
+
+    const result = await mux.video.assets.create(payload);
     // #6 - Option A - Could add pushing updates to the browser with something like Websockets
     return { status: 'success', result };
   }

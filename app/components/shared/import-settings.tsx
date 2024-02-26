@@ -29,6 +29,14 @@ const PLATFORM_METADATA_FIELDS = [
         name: 'autoGenerateCaptions',
         type: 'checkbox',
       },
+      {
+        label: 'Playback policy',
+        description: 'Select the playback policy for your videos',
+        docsUrl: 'https://docs.mux.com/guides/secure-video-playback',
+        name: 'playbackPolicy',
+        type: 'multi-checkbox',
+        values: ['public', 'signed'],
+      },
     ],
   },
 ];
@@ -105,6 +113,29 @@ export default function DestinationMetadata() {
               )}
 
               {field.type === 'text' && <input type={field.type} name={field.name} id={field.name} />}
+              {field.type === 'multi-checkbox' && (
+                <div>
+                  <fieldset>
+                    <legend className="block text-sm font-medium leading-6 text-gray-900">{field.label}</legend>
+                    <div className="mt-2 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-3">
+                      {field.values?.map((value) => (
+                        <div key={value} className="flex items-center">
+                          <input
+                            id={value}
+                            name={field.name}
+                            value={value}
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          />
+                          <label htmlFor={value} className="ml-3 min-w-0 flex-1 text-gray-500">
+                            {value}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </fieldset>
+                </div>
+              )}
             </div>
           );
         })}
