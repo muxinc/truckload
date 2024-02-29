@@ -20,6 +20,5 @@ Moving your video collection with ease
 
 ## Resources
 
-### AWS SDK v3 API reference
-
-https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/
+- [AWS SDK v3 API reference](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/)
+- [Mux API reference](https://docs.mux.com/api-reference)
