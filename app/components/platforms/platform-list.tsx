@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 
-import { sriracha } from '@/_fonts';
 import LogoMux from '@/components/platforms/mux/logo';
 import LogoS3 from '@/components/platforms/s3/logo';
 import useMigrationStore from '@/utils/store';
@@ -42,7 +41,7 @@ export default function PlatformList({ type }: { type: 'source' | 'destination' 
 
   return (
     <div>
-      <h2 className={`text-xl text-primary uppercase ${sriracha.className}`}>{title}</h2>
+      <h2 className={`text-xl text-primary uppercase}`}>{title}</h2>
       <p className="text-xs mb-4">{description}</p>
 
       <div className="grid grid-cols-3 gap-4">

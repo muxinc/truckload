@@ -44,7 +44,7 @@ export default function Page() {
   return (
     <>
       <div className="border-b-8 border-double mb-8 border-primary">
-        <Image src="/in-n-out-video.png" alt="In-n-out Video" width={200} height={100} className="mb-4" />
+        <Image src="/truckload.png" alt="Truckload Video" width={130} height={60} />
       </div>
 
       <div className="grid grid-cols-2 gap-10" style={{ gridTemplateColumns: `320px 1fr` }}>
@@ -61,11 +61,6 @@ export default function Page() {
           {currentStep === 'migration-status' && <MigrationStatus />}
         </div>
       </div>
-
-      <div
-        className="flex justify-end absolute right-0 bottom-0 left-0 bg-repeat-x bg-contain h-12"
-        style={{ backgroundImage: 'url(/tree.png)' }}
-      ></div>
 
       <Toaster />
     </>

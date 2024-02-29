@@ -1,4 +1,3 @@
-import { sriracha } from '@/_fonts';
 import useMigrationStore from '@/utils/store';
 import type { PlatformConfig } from '@/utils/store';
 
@@ -66,7 +65,7 @@ export default function DestinationMetadata() {
 
   return (
     <form onSubmit={onSubmit}>
-      <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>Choose your import settings</h2>
+      <h2 className={`text-primary uppercase font-bold text-lg`}>Choose your import settings</h2>
 
       <div className="flex flex-col gap-4 mb-10">
         {platformFields?.fields.map((field) => {

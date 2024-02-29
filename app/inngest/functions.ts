@@ -5,14 +5,15 @@ import type { GetEvents } from 'inngest';
 import Mux from '@mux/mux-node';
 import { PlaybackPolicy } from '@mux/mux-node/resources';
 
-import type { Video } from './client';
+import type { Video } from '@/utils/store';
 import { inngest } from './client';
+import { updateJobStatus } from '@/utils/job';
 
 type Events = GetEvents<typeof inngest>;
 
 export const fetchPage = inngest.createFunction(
   { id: 'fetch-page', name: 'Fetch page', concurrency: 1 },
-  { event: 'in-n-out/migration.fetch-page' },
+  { event: 'truckload/migration.fetch-page' },
   async ({ event, step }) => {
     const client = new S3Client({
       credentials: {
@@ -36,7 +37,7 @@ export const fetchPage = inngest.createFunction(
 
 export const fetchVideo = inngest.createFunction(
   { id: 'fetch-video', name: 'Fetch video', concurrency: 10 },
-  { event: 'in-n-out/video.fetch' },
+  { event: 'truckload/video.fetch' },
   async ({ event, step }) => {
     const client = new S3Client({
       credentials: {
@@ -68,7 +69,7 @@ export const fetchVideo = inngest.createFunction(
 // A separate function could be created for each destination platform
 export const transferVideo = inngest.createFunction(
   { id: 'transfer-video', name: 'Transfer video', concurrency: 10 },
-  { event: 'in-n-out/video.transfer' },
+  { event: 'truckload/video.transfer' },
   async ({ event, step }) => {
     const mux = new Mux({
       tokenId: event.data.encrypted.destinationPlatform.credentials!.publicKey,
@@ -94,20 +95,29 @@ export const transferVideo = inngest.createFunction(
     }
 
     const result = await mux.video.assets.create(payload);
-    // #6 - Option A - Could add pushing updates to the browser with something like Websockets
+
+    await updateJobStatus(event.data.jobId, 'migration.video.progress', {
+      video: {
+        id: event.data.encrypted.video.id,
+        status: 'in-progress',
+        progress: 0,
+      },
+    });
+
     return { status: 'success', result };
   }
 );
 
 export const processVideo = inngest.createFunction(
   { id: 'process-video', name: 'Process video' },
-  { event: 'in-n-out/video.process' },
+  { event: 'truckload/video.process' },
   async ({ event, step }) => {
     const videoData = event.data.encrypted.video;
 
     const video = await step.invoke(`fetch-video-${videoData.id}`, {
       function: fetchVideo,
       data: {
+        jobId: event.data.jobId,
         encrypted: {
           credentials: event.data.encrypted.sourcePlatform.credentials!,
           video: videoData,
@@ -118,6 +128,7 @@ export const processVideo = inngest.createFunction(
     const transfer = await step.invoke(`transfer-video-${videoData.id}`, {
       function: transferVideo,
       data: {
+        jobId: event.data.jobId,
         encrypted: {
           sourcePlatform: event.data.encrypted.sourcePlatform,
           destinationPlatform: event.data.encrypted.destinationPlatform,
@@ -132,7 +143,7 @@ export const processVideo = inngest.createFunction(
 
 export const initiateMigration = inngest.createFunction(
   { id: 'initiate-migration' },
-  { event: 'in-n-out/migration.init' },
+  { event: 'truckload/migration.init' },
   async ({ event, step }) => {
     let jobId = event.id;
     let hasMorePages = true;
@@ -150,6 +161,7 @@ export const initiateMigration = inngest.createFunction(
       const { cursor, isTruncated, videos } = await step.invoke(`fetch-page-${page}`, {
         function: fetchPage,
         data: {
+          jobId: jobId!,
           encrypted: event.data.encrypted.sourcePlatform.credentials,
         },
       });
@@ -162,14 +174,23 @@ export const initiateMigration = inngest.createFunction(
       console.log('isTruncated: ' + isTruncated);
       console.log('videos: ' + JSON.stringify(videos));
 
+      await updateJobStatus(jobId!, 'migration.videos.fetched', {
+        pageNumber: page,
+        videos: videoList.map((video) => ({ ...video, status: 'pending', progress: 0 })),
+        hasMorePages: isTruncated,
+      });
+
       if (!isTruncated) {
         hasMorePages = false;
+      } else {
+        page++;
       }
     }
 
-    const videoEvents = videoList.map((video): Events['in-n-out/video.process'] => ({
-      name: 'in-n-out/video.process',
+    const videoEvents = videoList.map((video): Events['truckload/video.process'] => ({
+      name: 'truckload/video.process',
       data: {
+        jobId: jobId!,
         encrypted: {
           sourcePlatform: event.data.encrypted.sourcePlatform,
           destinationPlatform: event.data.encrypted.destinationPlatform,

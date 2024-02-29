@@ -4,7 +4,35 @@ import type {} from '@redux-devtools/extension';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
-// required for devtools typing
+export type MigrationVideoProgressEvent = {
+  type: 'migration.video.progress';
+  data: {
+    video: VideoWithMigrationStatus[];
+  };
+};
+
+export type MigrationVideosFetchedEvent = {
+  type: 'migration.videos.fetched';
+  data: {
+    pageNumber: number;
+    videos: VideoWithMigrationStatus[];
+    hasMorePages: boolean;
+  };
+};
+
+export type MigrationStatus = {
+  status: 'pending' | 'in-progress' | 'retrying' | 'completed' | 'failed';
+  progress: number;
+};
+
+export type Video = {
+  id: string;
+  url?: string | undefined;
+  title?: string | undefined;
+  thumbnailUrl?: string | undefined;
+};
+
+export type VideoWithMigrationStatus = Video & MigrationStatus;
 
 type PlatformCredentialsMetadata = {
   [key: string]: string;
@@ -42,16 +70,18 @@ export type AssetFilter = {
   url: string;
 };
 
-type Job = {
+export type MigrationJob = {
   id: string;
   status: 'pending' | 'in-progress' | 'completed' | 'failed';
+  progress: number;
+  videos: VideoWithMigrationStatus[];
 };
 
 interface MigrationState {
   sourcePlatform: SourcePlatform | null;
   destinationPlatform: DestinationPlatform | null;
   assetFilter: AssetFilter[] | null;
-  job: Job | null;
+  job: MigrationJob | null;
   currentStep: MigrationStep;
   setAssetFilter: (filter: AssetFilter[] | null) => void;
   setPlatform: <T extends PlatformType>(
@@ -72,6 +102,7 @@ type MigrationStep =
   | 'review'
   | 'migration-status';
 
+// required for devtools typing
 const useMigrationStore = create<MigrationState>()(
   devtools(
     persist(
@@ -99,7 +130,7 @@ const useMigrationStore = create<MigrationState>()(
         },
       }),
       {
-        name: 'in-n-out-migration-storage',
+        name: 'truckload-migration-storage',
       }
     )
   )

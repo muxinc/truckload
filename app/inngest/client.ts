@@ -1,15 +1,11 @@
 import { encryptionMiddleware } from '@inngest/middleware-encryption';
 import { EventSchemas, Inngest } from 'inngest';
 
-import type { AssetFilter, DestinationPlatform, PlatformCredentials, SourcePlatform } from '@/utils/store';
-
-export type Video = {
-  id: string;
-  url?: string | undefined;
-};
+import type { AssetFilter, DestinationPlatform, PlatformCredentials, SourcePlatform, Video } from '@/utils/store';
 
 type FetchVideo = {
   data: {
+    jobId: string;
     encrypted: {
       credentials: PlatformCredentials;
       video: Video;
@@ -19,12 +15,14 @@ type FetchVideo = {
 
 type FetchPage = {
   data: {
+    jobId: string;
     encrypted: PlatformCredentials;
   };
 };
 
 type ProcessVideo = {
   data: {
+    jobId: string;
     encrypted: {
       sourcePlatform: SourcePlatform;
       destinationPlatform: DestinationPlatform;
@@ -44,11 +42,11 @@ type InitMigration = {
 };
 
 type Events = {
-  'in-n-out/migration.init': InitMigration;
-  'in-n-out/migration.fetch-page': FetchPage;
-  'in-n-out/video.process': ProcessVideo;
-  'in-n-out/video.fetch': FetchVideo;
-  'in-n-out/video.transfer': ProcessVideo;
+  'truckload/migration.init': InitMigration;
+  'truckload/migration.fetch-page': FetchPage;
+  'truckload/video.process': ProcessVideo;
+  'truckload/video.fetch': FetchVideo;
+  'truckload/video.transfer': ProcessVideo;
 };
 
 const mw = encryptionMiddleware({
@@ -56,7 +54,7 @@ const mw = encryptionMiddleware({
 });
 
 export const inngest = new Inngest({
-  id: 'in-n-out-video',
+  id: 'truckload-video',
   middleware: [mw],
   schemas: new EventSchemas().fromRecord<Events>(),
 });

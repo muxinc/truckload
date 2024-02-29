@@ -1,6 +1,8 @@
-# In-n-out Video
+# Truckload
 
-<img src="public/in-n-out-video.png" alt="In-n-out Video" width="200px">
+Moving your video collection with ease
+
+<img src="public/truckload.png" alt="Truckload" width="200px">
 
 ## How to use
 
@@ -11,6 +13,10 @@
 ### Run local Inngest server
 
 `npx inngest-cli@latest dev`
+
+### Run partykit server
+
+`cd app && npx partykit dev`
 
 ## Resources
 

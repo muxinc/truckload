@@ -1,6 +1,5 @@
 import toast from 'react-hot-toast';
 
-import { sriracha } from '@/_fonts';
 import useMigrationStore from '@/utils/store';
 import type { PlatformCredentials } from '@/utils/store';
 
@@ -107,9 +106,7 @@ export default function PlatformCredentialsForm() {
 
   return (
     <div className="max-w-lg">
-      <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>
-        Add your {platform.name} credentials
-      </h2>
+      <h2 className={`text-primary uppercase font-bold text-lg`}>Add your {platform.name} credentials</h2>
       <p className="text-xs">Only stored locally. Encrypted in transit.</p>
 
       <form onSubmit={onSubmit}>

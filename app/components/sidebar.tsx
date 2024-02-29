@@ -12,6 +12,10 @@ export default function Sidebar() {
   const assetFilter = useMigrationStore((state) => state.assetFilter);
   const setAssetFilter = useMigrationStore((state) => state.setAssetFilter);
 
+  const state = useMigrationStore.getState();
+
+  console.dir(state);
+
   const onSubmit = async () => {
     console.log({ sourcePlatform, destinationPlatform, assetFilter });
     const result = await fetch('/api/job', {
@@ -21,7 +25,7 @@ export default function Sidebar() {
 
     if (result.status === 201) {
       const { id } = await result.json();
-      // useMigrationStore.setState({ job: { id } });
+      useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: [] } });
 
       setCurrentStep('migration-status');
       toast('Migration initiated', { icon: '👍' });
@@ -32,7 +36,7 @@ export default function Sidebar() {
 
   return (
     <div className="relative border-2 border-slate-200 rounded shadow-xl p-4">
-      <Banner>Order summary</Banner>
+      <h2 className="font-bold">Moving list</h2>
 
       <div className="flex flex-col gap-4 mt-10 mb-16">
         {!sourcePlatform && (

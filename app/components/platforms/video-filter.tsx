@@ -1,4 +1,3 @@
-import { sriracha } from '@/_fonts';
 import useMigrationStore from '@/utils/store';
 
 export default function VideoFilter() {
@@ -7,7 +6,7 @@ export default function VideoFilter() {
   return (
     <div>
       <div className="mb-4">
-        <h2 className={`text-primary uppercase font-bold text-lg ${sriracha.className}`}>Select your videos</h2>
+        <h2 className={`text-primary uppercase font-bold text-lg`}>Select your videos</h2>
         <p className="text-xs">What exactly do you want to transfer?</p>
       </div>
 
