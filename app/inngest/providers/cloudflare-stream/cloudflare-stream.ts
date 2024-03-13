@@ -35,6 +35,30 @@ export const fetchPage = inngest.createFunction(
   }
 );
 
+export const checkSourceStatus = inngest.createFunction(
+  { id: 'check-source-status-cloudflare-stream', name: 'Check source status Cloudflare Steam', concurrency: 10 },
+  { event: 'truckload/migration.check-source-status-cloudflare-stream' },
+  async ({ event, step }) => {
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${event.data.encrypted.publicKey}/stream/${event.data.encrypted.video.id}/downloads`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${event.data.encrypted.credentials.secretKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const result = await response.json();
+
+    const isReady = result.result.default.status === 'ready';
+    const url = result.result.default.url;
+    const payload = { isReady, url };
+    return payload;
+  }
+);
+
 export const fetchVideo = inngest.createFunction(
   { id: 'fetch-video-cloudflare-stream', name: 'Fetch video', concurrency: 10 },
   { event: 'truckload/video.fetch' },
@@ -42,6 +66,7 @@ export const fetchVideo = inngest.createFunction(
     const response = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${event.data.encrypted.publicKey}/stream/${event.data.encrypted.video.id}/downloads`,
       {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${event.data.encrypted.credentials.secretKey}`,
           'Content-Type': 'application/json',
@@ -56,17 +81,21 @@ export const fetchVideo = inngest.createFunction(
       url: '',
     };
 
-    // todo: poll for ready and fire a related event to continue
-    if (result.result.default.status === 'inprogress') {
-      const downloadReady = await step.waitForEvent('wait-for-download-ready-cloudflare-stream', {
-        event: 'app/onboarding.completed',
-        timeout: '1d',
-        match: 'data.encrypted.video.id',
+    let sourceReady = result.result.default.status === 'ready';
+
+    while (!sourceReady && event.data.encrypted.credentials) {
+      const { isReady, url } = await step.invoke(`check-source-status-cloudflare-stream`, {
+        function: checkSourceStatus,
+        data: {
+          jobId: event.data.jobId,
+          encrypted: event.data.encrypted.credentials,
+        },
       });
 
-      video.url = downloadReady?.data.encrypted.video.id;
-    } else if (result.result.default.status === 'ready') {
-      video.url = result.result.default.url;
+      if (isReady) {
+        video.url = url;
+        sourceReady = true;
+      }
     }
 
     return video;
