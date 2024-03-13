@@ -3,14 +3,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { GetEvents } from 'inngest';
 
 import type { Video } from '@/utils/store';
-import { inngest } from './client';
-import { updateJobStatus } from '@/utils/job';
-import type { VideoWithMigrationStatus } from '@/utils/store';
+import { inngest } from '@/inngest/client';
 
 type Events = GetEvents<typeof inngest>;
 
 export const fetchPage = inngest.createFunction(
-  { id: 'fetch-page', name: 'Fetch page', concurrency: 1 },
+  { id: 'fetch-page-s3', name: 'Fetch page', concurrency: 1 },
   { event: 'truckload/migration.fetch-page' },
   async ({ event, step }) => {
     const client = new S3Client({
@@ -37,7 +35,7 @@ export const fetchPage = inngest.createFunction(
 );
 
 export const fetchVideo = inngest.createFunction(
-  { id: 'fetch-video', name: 'Fetch video', concurrency: 10 },
+  { id: 'fetch-video-s3', name: 'Fetch video', concurrency: 10 },
   { event: 'truckload/video.fetch' },
   async ({ event, step }) => {
     const client = new S3Client({
