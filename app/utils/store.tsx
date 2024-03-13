@@ -75,7 +75,7 @@ export type MigrationJob = {
   id: string;
   status: 'pending' | 'in-progress' | 'completed' | 'failed';
   progress: number;
-  videos: VideoWithMigrationStatus[];
+  videos: Record<string, VideoWithMigrationStatus>;
 };
 
 type MigrationActions = {
@@ -85,6 +85,7 @@ type MigrationActions = {
     platform: T extends 'source' ? SourcePlatform | null : DestinationPlatform | null
   ) => void;
   setCurrentStep: (step: MigrationStep) => void;
+  setVideoMigrationProgress: (id: string, status: VideoWithMigrationStatus) => void;
 };
 
 interface MigrationState {
@@ -131,6 +132,13 @@ const useMigrationStore = create<MigrationState & MigrationActions>()(
           } else if (type === 'destination') {
             set({ destinationPlatform: platform as DestinationPlatform | null });
           }
+        },
+        setVideoMigrationProgress: (id: string, status: VideoWithMigrationStatus) => {
+          set((state) => {
+            if (state.job) {
+              state.job.videos[id] = status;
+            }
+          });
         },
       })),
       {

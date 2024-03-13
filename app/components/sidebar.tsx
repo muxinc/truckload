@@ -1,6 +1,4 @@
 import toast from 'react-hot-toast';
-
-import Banner from '@/components/banner';
 import useMigrationStore from '@/utils/store';
 
 export default function Sidebar() {
@@ -25,7 +23,7 @@ export default function Sidebar() {
 
     if (result.status === 201) {
       const { id } = await result.json();
-      useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: [] } });
+      useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: {} } });
 
       setCurrentStep('migration-status');
       toast('Migration initiated', { icon: '👍' });

@@ -8,6 +8,7 @@ import { PlaybackPolicy } from '@mux/mux-node/resources';
 import type { Video } from '@/utils/store';
 import { inngest } from './client';
 import { updateJobStatus } from '@/utils/job';
+import type { VideoWithMigrationStatus } from '@/utils/store';
 
 type Events = GetEvents<typeof inngest>;
 
@@ -29,7 +30,10 @@ export const fetchPage = inngest.createFunction(
     const isTruncated = results.IsTruncated;
     const cursor = results.NextContinuationToken;
     const videos =
-      results.Contents?.map((object) => ({ id: object.Key })).filter((item): item is Video => !!item.id) || [];
+      results.Contents?.map((object) => ({ id: object.Key })).filter(
+        (item): item is Video => !!item.id && /\.(mp4|mov|mp3)$/i.test(item.id)
+      ) || [];
+
     const payload = { isTruncated, cursor, videos };
     return payload;
   }
@@ -177,7 +181,10 @@ export const initiateMigration = inngest.createFunction(
 
       await updateJobStatus(jobId!, 'migration.videos.fetched', {
         pageNumber: page,
-        videos: videoList.map((video) => ({ ...video, status: 'pending', progress: 0 })),
+        videos: videoList.reduce<Record<string, VideoWithMigrationStatus>>((acc, video) => {
+          acc[video.id] = { ...video, status: 'pending', progress: 0 };
+          return acc;
+        }, {}),
         hasMorePages: isTruncated,
       });
 
