@@ -14,9 +14,17 @@ Moving your video collection with ease
 
 `npx inngest-cli@latest dev`
 
-### Run partykit server
+### Run PartyKit server
+
+[PartyKit](https://www.partykit.io/) is a comprehensive solution for real-time sync within your application.
+
+In this app, we're really only using it to receive status updates from the video migration background jobs and destination webhooks.
+
+To receive these notifications and pipe them back to the front-end for status updates, you need to start a PartyKit server locally.
 
 `cd app && npx partykit dev`
+
+PartyKit will spin up on port `1999`
 
 ## Handling webhooks
 

@@ -3,10 +3,11 @@
 import usePartySocket from 'partysocket/react';
 import useMigrationStore from '@/utils/store';
 
-import type { VideoWithMigrationStatus } from '@/utils/store';
+// import type { VideoWithMigrationStatus } from '@/utils/store';
 
 export default function MigrationStatus() {
   const job = useMigrationStore((state) => state.job);
+  const setVideoMigrationProgress = useMigrationStore((state) => state.setVideoMigrationProgress);
 
   const socket = usePartySocket({
     host: process.env.NEXT_PUBLIC_PARTYKIT_URL,
@@ -23,6 +24,11 @@ export default function MigrationStatus() {
           const { hasMorePages, pageNumber, videos } = payload.data;
           useMigrationStore.setState({ job: { ...job, ...payload.data } });
           break;
+        case 'migration.video.progress':
+          const { video } = payload.data;
+
+          setVideoMigrationProgress(video.id, video);
+          break;
         default:
           break;
       }
@@ -32,6 +38,8 @@ export default function MigrationStatus() {
   const clearJob = () => {
     useMigrationStore.setState({ job: undefined, currentStep: 'review' });
   };
+
+  const videoIds = Object.keys(job?.videos || {});
 
   return (
     <div>
@@ -54,18 +62,22 @@ export default function MigrationStatus() {
             </tr>
           </thead>
           <tbody className="[&amp;_tr:last-child]:border-0">
-            {job?.videos.map((video) => (
-              <tr
-                key={video.id}
-                className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-              >
-                <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
-                  {video.title || video.id}
-                </td>
-                <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.progress}%</td>
-                <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.status}</td>
-              </tr>
-            ))}
+            {videoIds.map((id) => {
+              const video = job?.videos[id];
+              if (!video) return null;
+              return (
+                <tr
+                  key={video.id}
+                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                >
+                  <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">
+                    {video.title || video.id}
+                  </td>
+                  <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.progress}%</td>
+                  <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.status}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
