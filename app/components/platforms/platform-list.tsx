@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 
+import LogoCloudflare from '@/components/platforms/cloudflare/logo';
 import LogoMux from '@/components/platforms/mux/logo';
 import LogoS3 from '@/components/platforms/s3/logo';
 import useMigrationStore from '@/utils/store';
@@ -16,6 +17,11 @@ const PLATFORMS: Platforms = {
       id: 's3',
       name: 'Amazon S3',
       logo: LogoS3,
+    },
+    {
+      id: 'cloudflare-stream',
+      name: 'Cloudflare Stream',
+      logo: LogoCloudflare,
     },
   ],
   destination: [
