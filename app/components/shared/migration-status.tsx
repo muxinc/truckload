@@ -23,6 +23,11 @@ export default function MigrationStatus() {
           const { hasMorePages, pageNumber, videos } = payload.data;
           useMigrationStore.setState({ job: { ...job, ...payload.data } });
           break;
+        case 'migration.video.progress':
+          const {
+            video: { id, progress, status },
+          } = payload.data;
+          break;
         default:
           break;
       }

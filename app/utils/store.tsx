@@ -3,6 +3,7 @@
 import type {} from '@redux-devtools/extension';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 export type MigrationVideoProgressEvent = {
   type: 'migration.video.progress';
@@ -77,18 +78,21 @@ export type MigrationJob = {
   videos: VideoWithMigrationStatus[];
 };
 
-interface MigrationState {
-  sourcePlatform: SourcePlatform | null;
-  destinationPlatform: DestinationPlatform | null;
-  assetFilter: AssetFilter[] | null;
-  job: MigrationJob | null;
-  currentStep: MigrationStep;
+type MigrationActions = {
   setAssetFilter: (filter: AssetFilter[] | null) => void;
   setPlatform: <T extends PlatformType>(
     type: T,
     platform: T extends 'source' ? SourcePlatform | null : DestinationPlatform | null
   ) => void;
   setCurrentStep: (step: MigrationStep) => void;
+};
+
+interface MigrationState {
+  sourcePlatform: SourcePlatform | null;
+  destinationPlatform: DestinationPlatform | null;
+  assetFilter: AssetFilter[] | null;
+  job: MigrationJob | null;
+  currentStep: MigrationStep;
 }
 
 type MigrationStep =
@@ -103,10 +107,10 @@ type MigrationStep =
   | 'migration-status';
 
 // required for devtools typing
-const useMigrationStore = create<MigrationState>()(
+const useMigrationStore = create<MigrationState & MigrationActions>()(
   devtools(
     persist(
-      (set) => ({
+      immer((set) => ({
         sourcePlatform: null,
         destinationPlatform: null,
         assetFilter: null,
@@ -128,7 +132,7 @@ const useMigrationStore = create<MigrationState>()(
             set({ destinationPlatform: platform as DestinationPlatform | null });
           }
         },
-      }),
+      })),
       {
         name: 'truckload-migration-storage',
       }

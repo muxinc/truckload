@@ -80,6 +80,7 @@ export const transferVideo = inngest.createFunction(
 
     let payload: Mux.Video.Assets.AssetCreateParams = {
       input: [{ url: event.data.encrypted.video.url }],
+      passthrough: JSON.stringify({ jobId: event.data.jobId, sourceVideoId: event.data.encrypted.video.id }),
     };
 
     if (config?.maxResolutionTier) {
