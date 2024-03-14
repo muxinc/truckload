@@ -47,6 +47,7 @@ type Events = {
   'truckload/video.process': ProcessVideo;
   'truckload/video.fetch': FetchVideo;
   'truckload/video.transfer': ProcessVideo;
+  'truckload/cloudflare-stream.check-source-status': FetchVideo;
 };
 
 const mw = encryptionMiddleware({

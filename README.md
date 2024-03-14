@@ -12,6 +12,10 @@ Moving your video collection with ease
 
 ### Run local Inngest server
 
+[Inngest](https://www.inngest.com) makes serverless queues, background jobs, and workflows effortless. Truckload uses Inngest to facilitate the loading and migrating of each video.
+
+You can start a [local Inngest development server](https://www.inngest.com/docs/local-development) with the following command:
+
 `npx inngest-cli@latest dev`
 
 ### Run PartyKit server
