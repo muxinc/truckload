@@ -32,23 +32,31 @@ export const fetchPage = inngest.createFunction(
 export const checkSourceStatus = inngest.createFunction(
   { id: 'check-source-status-cloudflare-stream', name: 'Check source status Cloudflare Steam', concurrency: 10 },
   { event: 'truckload/cloudflare-stream.check-source-status' },
-  async ({ event, step }): Promise<{ isReady: boolean; url: string }> => {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${event.data.encrypted.credentials.publicKey}/stream/${event.data.encrypted.video.id}/downloads`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${event.data.encrypted.credentials.secretKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+  async ({ event, step }): Promise<{ url: string }> => {
+    let isReady = false;
+    let url = '';
 
-    const result = await response.json();
+    while (!isReady) {
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${event.data.encrypted.credentials.publicKey}/stream/${event.data.encrypted.video.id}/downloads`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${event.data.encrypted.credentials.secretKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-    const isReady = result.result.default.status === 'ready';
-    const url = result.result.default.url as string;
-    const payload = { isReady, url };
+      const result = await response.json();
+      isReady = result.result.default.status === 'ready';
+      url = result.result.default.url as string;
+
+      // sleep for 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    const payload = { url };
     return payload;
   }
 );
@@ -70,28 +78,24 @@ export const fetchVideo = inngest.createFunction(
 
     const result = await response.json();
 
-    let video = {
-      id: event.data.encrypted.video.id,
-      url: '',
-    };
-
-    let sourceReady = result.result.default.status === 'ready';
-
-    while (!sourceReady && event.data.encrypted.credentials) {
-      const { isReady, url } = await step.invoke(`check-source-status-cloudflare-stream`, {
-        function: checkSourceStatus,
-        data: {
-          jobId: event.data.jobId,
-          encrypted: event.data.encrypted,
-        },
-      });
-
-      if (isReady) {
-        video.url = url;
-        sourceReady = true;
-      }
+    if (result.result.default.status === 'ready') {
+      return {
+        id: event.data.encrypted.video.id,
+        url: result.result.default.url,
+      };
     }
 
-    return video;
+    const { url } = await step.invoke(`check-source-status-cloudflare-stream`, {
+      function: checkSourceStatus,
+      data: {
+        jobId: event.data.jobId,
+        encrypted: event.data.encrypted,
+      },
+    });
+
+    return {
+      id: event.data.encrypted.video.id,
+      url,
+    };
   }
 );
