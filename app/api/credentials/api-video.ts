@@ -1,4 +1,4 @@
-import { PRODUCTION_ENDPOINT, SANDBOX_ENDPOINT } from '@/inngest/providers/api-video/api-video';
+import { PRODUCTION_ENDPOINT, SANDBOX_ENDPOINT } from '@/inngest/providers/api-video/constants';
 import type { PlatformCredentials } from '@/utils/store';
 
 export default async function validate(data: PlatformCredentials) {
