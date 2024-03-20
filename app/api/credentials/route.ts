@@ -10,6 +10,26 @@ export async function POST(request: Request) {
   const data: PlatformCredentials = await request.json();
 
   switch (data.additionalMetadata?.platformId) {
+    case 'cloudflare-stream':
+      try {
+        const response = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+          headers: {
+            Authorization: `Bearer ${data.secretKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          return new Response('ok', { status: 200 });
+        } else {
+          return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+        }
+      } catch (error) {
+        console.error('Error:', error); // Catching and logging any errors
+        return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+      }
+      break;
     case 's3':
       const client = new S3Client({
         credentials: {

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import '@/_styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Mux',
+  title: 'Truckload - move your videos with ease',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

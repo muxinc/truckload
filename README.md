@@ -12,6 +12,10 @@ Moving your video collection with ease
 
 ### Run local Inngest server
 
+[Inngest](https://www.inngest.com) makes serverless queues, background jobs, and workflows effortless. Truckload uses Inngest to facilitate the loading and migrating of each video.
+
+You can start a [local Inngest development server](https://www.inngest.com/docs/local-development) with the following command:
+
 `npx inngest-cli@latest dev`
 
 ### Run PartyKit server
@@ -47,3 +51,11 @@ To solve this, you can stand up a free, publicly-accessible tunnel URL using ngr
 
 - [AWS SDK v3 API reference](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/)
 - [Mux API reference](https://docs.mux.com/api-reference)
+
+## Cloudflare Stream
+
+You'll need an [API Token](https://dash.cloudflare.com/profile/api-tokens) with write access to connect your account.
+
+### Account ID
+
+This value can be found in the dashboard sidebar and is used to find your Stream account.

@@ -42,6 +42,22 @@ const PLATFORM_CREDENTIALS = [
     ],
   },
   {
+    name: 'Cloudflare Stream',
+    id: 'cloudflare-stream',
+    values: [
+      {
+        label: 'Account ID',
+        name: 'publicKey',
+        type: 'text',
+      },
+      {
+        label: 'API Token',
+        name: 'secretKey',
+        type: 'text',
+      },
+    ],
+  },
+  {
     name: 'Mux',
     id: 'mux',
     values: [
