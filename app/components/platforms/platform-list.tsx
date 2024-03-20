@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 
+import LogoApiVideo from '@/components/platforms/api-video/logo';
 import LogoCloudflare from '@/components/platforms/cloudflare/logo';
 import LogoMux from '@/components/platforms/mux/logo';
 import LogoS3 from '@/components/platforms/s3/logo';
@@ -22,6 +23,11 @@ const PLATFORMS: Platforms = {
       id: 'cloudflare-stream',
       name: 'Cloudflare Stream',
       logo: LogoCloudflare,
+    },
+    {
+      id: 'api-video',
+      name: 'Api.video',
+      logo: LogoApiVideo,
     },
   ],
   destination: [

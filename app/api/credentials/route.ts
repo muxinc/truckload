@@ -2,6 +2,8 @@ import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 
 import Mux from '@mux/mux-node';
 
+import validateApiVideoCredentials from './api-video';
+
 import type { PlatformCredentials } from '@/utils/store';
 
 export const dynamic = 'force-dynamic';
@@ -10,6 +12,10 @@ export async function POST(request: Request) {
   const data: PlatformCredentials = await request.json();
 
   switch (data.additionalMetadata?.platformId) {
+    case 'api-video': {
+      const result = await validateApiVideoCredentials(data);
+      return result;
+    }
     case 'cloudflare-stream':
       try {
         const response = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
@@ -29,7 +35,6 @@ export async function POST(request: Request) {
         console.error('Error:', error); // Catching and logging any errors
         return Response.json({ error: 'Invalid credentials' }, { status: 401 });
       }
-      break;
     case 's3':
       const client = new S3Client({
         credentials: {

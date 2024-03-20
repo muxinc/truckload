@@ -42,6 +42,28 @@ const PLATFORM_CREDENTIALS = [
     ],
   },
   {
+    name: 'Api.video',
+    id: 'api-video',
+    values: [
+      {
+        label: 'Account email',
+        name: 'publicKey',
+        type: 'text',
+      },
+      {
+        label: 'API Key',
+        name: 'secretKey',
+        type: 'text',
+      },
+      {
+        label: 'Environment',
+        name: 'environment',
+        type: 'select',
+        values: ['sandbox', 'production'],
+      },
+    ],
+  },
+  {
     name: 'Cloudflare Stream',
     id: 'cloudflare-stream',
     values: [
