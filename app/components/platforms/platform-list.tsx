@@ -58,7 +58,7 @@ export default function PlatformList({ type }: { type: 'source' | 'destination' 
             key={platform.id}
             className={clsx({
               'border-primary': sourcePlatform?.id === platform.id,
-              'border-slate-200': sourcePlatform?.id !== platform.id,
+              'border-slate-200 hover:border-slate-300 focus:border-slate-300': sourcePlatform?.id !== platform.id,
               'rounded p-4 flex flex-col items-center cursor-pointer border-2 w-40 h-40': true,
             })}
             onClick={() => {

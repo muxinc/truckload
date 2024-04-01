@@ -34,7 +34,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="relative border-2 border-slate-200 rounded p-4 -mt-4">
+    <div className="w-full max-w-128 md:w-80 relative border-2 border-slate-200 rounded p-4 -mt-4">
       <Heading>Moving list</Heading>
 
       <div className="flex flex-col gap-4 mt-10 mb-16">
@@ -42,7 +42,8 @@ export default function Sidebar() {
           <p className="text-sm text-gray-600">
             This list will grow as you prepare your move.
             <br />
-            Start over there ➡️
+            Start over there <span className="hidden md:inline">➡️</span>
+            <span className="inline md:hidden">⬇️</span>
           </p>
         )}
 
