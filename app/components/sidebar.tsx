@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 import useMigrationStore from '@/utils/store';
+import Heading from './heading';
 
 export default function Sidebar() {
   const sourcePlatform = useMigrationStore((state) => state.sourcePlatform);
@@ -26,21 +27,23 @@ export default function Sidebar() {
       useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: {} } });
 
       setCurrentStep('migration-status');
-      toast('Migration initiated', { icon: '👍' });
+      toast('Migrationtext-xl text-primary uppercaseinitiated', { icon: '👍' });
     } else {
       toast.error('Error initiating migration');
     }
   };
 
   return (
-    <div className="relative border-2 border-slate-200 rounded shadow-xl p-4">
-      <h2 className="font-bold">Moving list</h2>
+    <div className="relative border-2 border-slate-200 rounded p-4 -mt-4">
+      <Heading>Moving list</Heading>
 
       <div className="flex flex-col gap-4 mt-10 mb-16">
         {!sourcePlatform && (
-          <div>
-            <p>Start over there ➡️</p>
-          </div>
+          <p className="text-sm text-gray-600">
+            This list will grow as you prepare your move.
+            <br />
+            Start over there ➡️
+          </p>
         )}
 
         {sourcePlatform && (
@@ -55,8 +58,10 @@ export default function Sidebar() {
                 setPlatform('source', null);
                 setCurrentStep('select-source');
               }}
+              className="text-3xl text-primary"
+              aria-label={`Remove ${sourcePlatform?.name} as source platform`}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}

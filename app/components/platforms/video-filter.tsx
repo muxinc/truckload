@@ -1,4 +1,5 @@
 import useMigrationStore from '@/utils/store';
+import Heading from '../heading';
 
 export default function VideoFilter() {
   const setCurrentStep = useMigrationStore((state) => state.setCurrentStep);
@@ -6,7 +7,7 @@ export default function VideoFilter() {
   return (
     <div>
       <div className="mb-4">
-        <h2 className={`text-primary uppercase font-bold text-lg`}>Select your videos</h2>
+        <Heading>Select your videos</Heading>
         <p className="text-xs">What exactly do you want to transfer?</p>
       </div>
 

@@ -1,5 +1,6 @@
 import useMigrationStore from '@/utils/store';
 import type { PlatformConfig } from '@/utils/store';
+import Heading from '../heading';
 
 const PLATFORM_METADATA_FIELDS = [
   {
@@ -65,7 +66,7 @@ export default function DestinationMetadata() {
 
   return (
     <form onSubmit={onSubmit}>
-      <h2 className={`text-primary uppercase font-bold text-lg`}>Choose your import settings</h2>
+      <Heading>Choose your import settings</Heading>
 
       <div className="flex flex-col gap-4 mb-10">
         {platformFields?.fields.map((field) => {
@@ -80,7 +81,7 @@ export default function DestinationMetadata() {
                     <select
                       id={field.name}
                       name={field.name}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     >
                       {field.values?.map((value) => (
                         <option key={value} value={value}>
@@ -142,7 +143,7 @@ export default function DestinationMetadata() {
 
       <button
         type="submit"
-        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         Confirm and review
       </button>
