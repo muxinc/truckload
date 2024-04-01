@@ -14,6 +14,9 @@ module.exports = {
         },
         secondary: '#ffc803',
       },
+      spacing: {
+        128: '32rem',
+      },
     },
   },
   plugins: [],

@@ -52,7 +52,7 @@ export default function PlatformList({ type }: { type: 'source' | 'destination' 
       <Heading>{title}</Heading>
       <p className="text-xs mb-4">{description}</p>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 max-w-128">
         {platforms.map((platform) => (
           <div
             key={platform.id}
