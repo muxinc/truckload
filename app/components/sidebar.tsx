@@ -75,12 +75,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('source', { ...sourcePlatform, credentials: undefined });
                 setCurrentStep('set-source-credentials');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -93,12 +94,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setAssetFilter(null);
                 setCurrentStep('set-video-filter');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -111,12 +113,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', null);
                 setCurrentStep('select-destination');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -129,12 +132,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', { ...destinationPlatform, credentials: undefined });
                 setCurrentStep('set-destination-credentials');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -147,12 +151,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', { ...destinationPlatform, config: undefined });
                 setCurrentStep('set-import-settings');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -160,11 +165,11 @@ export default function Sidebar() {
 
       {currentStep === 'review' && (
         <button
-          className="font-sans uppercase rounded text-base bg-primary text-white py-4 px-8 font-semibold disabled:bg-gray-300 w-full"
+          className="font-sans uppercase rounded text-base bg-primary hover:bg-primary-dark focus-visible:bg-primary-dark text-white py-4 px-8 font-semibold disabled:bg-gray-300 w-full"
           disabled={currentStep !== 'review'}
           onClick={onSubmit}
         >
-          Place order
+          Move videos
         </button>
       )}
     </div>
