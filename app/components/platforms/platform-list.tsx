@@ -1,8 +1,10 @@
 import clsx from 'clsx';
 
+import LogoApiVideo from '@/components/platforms/api-video/logo.svg';
 import LogoCloudflare from '@/components/platforms/cloudflare/logo.svg';
 import LogoMux from '@/components/platforms/mux/logo.svg';
 import LogoS3 from '@/components/platforms/s3/logo.svg';
+
 import useMigrationStore from '@/utils/store';
 import { DestinationPlatform, SourcePlatform } from '@/utils/store';
 import Image from 'next/image';
@@ -24,6 +26,11 @@ const PLATFORMS: Platforms = {
       id: 'cloudflare-stream',
       name: 'Cloudflare Stream',
       logo: LogoCloudflare,
+    },
+    {
+      id: 'api-video',
+      name: 'Api.video',
+      logo: LogoApiVideo,
     },
   ],
   destination: [

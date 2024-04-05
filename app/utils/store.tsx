@@ -48,7 +48,7 @@ export type PlatformCredentials = {
 };
 
 export interface SourcePlatform extends Platform {
-  id: 's3' | 'cloudflare-stream';
+  id: 's3' | 'cloudflare-stream' | 'api-video';
   type: 'source';
 }
 
