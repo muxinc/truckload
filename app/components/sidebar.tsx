@@ -27,7 +27,7 @@ export default function Sidebar() {
       useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: {} } });
 
       setCurrentStep('migration-status');
-      toast('Migrationtext-xl text-primary uppercaseinitiated', { icon: '👍' });
+      toast('Migration initiated', { icon: '👍' });
     } else {
       toast.error('Error initiating migration');
     }

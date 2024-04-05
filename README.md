@@ -43,7 +43,7 @@ To solve this, you can stand up a free, publicly-accessible tunnel URL using ngr
 2. Sign in with your existing account or with GitHub
 3. Follow the instructions to install and authenticate `ngrok` on your machine
 4. Create an `ngrok` endpoint for your local app by running `ngrok http http://localhost:3000`
-5. Grab the resulting URL for use as your webhook destination:
+5. Grab the resulting URL for use as your webhook destination, and append `/api/webhooks/[provider]`:
 
 <img src="public/screenshots/ngrok-url.png" alt="Ngrok URL" width="500px">
 
