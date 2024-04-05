@@ -1,10 +1,12 @@
 import clsx from 'clsx';
 
-import LogoCloudflare from '@/components/platforms/cloudflare/logo';
-import LogoMux from '@/components/platforms/mux/logo';
-import LogoS3 from '@/components/platforms/s3/logo';
+import LogoCloudflare from '@/components/platforms/cloudflare/logo.svg';
+import LogoMux from '@/components/platforms/mux/logo.svg';
+import LogoS3 from '@/components/platforms/s3/logo.svg';
 import useMigrationStore from '@/utils/store';
 import { DestinationPlatform, SourcePlatform } from '@/utils/store';
+import Image from 'next/image';
+import Heading from '../heading';
 
 type Platforms = {
   source: Array<Omit<SourcePlatform, 'type'>>;
@@ -47,17 +49,17 @@ export default function PlatformList({ type }: { type: 'source' | 'destination' 
 
   return (
     <div>
-      <h2 className={`text-xl text-primary uppercase}`}>{title}</h2>
+      <Heading>{title}</Heading>
       <p className="text-xs mb-4">{description}</p>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="flex flex-wrap gap-4 max-w-128">
         {platforms.map((platform) => (
           <div
             key={platform.id}
             className={clsx({
               'border-primary': sourcePlatform?.id === platform.id,
-              'border-slate-200': sourcePlatform?.id !== platform.id,
-              'shadow rounded p-4 flex flex-col items-center cursor-pointer border-2 w-40 h-40': true,
+              'border-slate-200 hover:border-slate-300 focus:border-slate-300': sourcePlatform?.id !== platform.id,
+              'rounded p-4 flex flex-col items-center cursor-pointer border-2 w-40 h-40': true,
             })}
             onClick={() => {
               const platformWithType = { ...platform, type };
@@ -69,8 +71,8 @@ export default function PlatformList({ type }: { type: 'source' | 'destination' 
               setCurrentStep(isSource ? 'set-source-credentials' : 'set-destination-credentials');
             }}
           >
-            <div className="h-20 w-20 flex items-center justify-center">
-              <platform.logo />
+            <div className="h-20 w-20 flex items-center justify-center relative">
+              <Image src={platform.logo} fill alt={`${platform.name} logo`} />
             </div>
             <h3 className="font-semibold text-slate-700 text-sm">{platform.name}</h3>
             {/* <p className='text-sm'>{platform.description}</p> */}

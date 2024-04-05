@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 
 import useMigrationStore from '@/utils/store';
 import type { PlatformCredentials } from '@/utils/store';
+import Heading from '../heading';
 
 const PLATFORM_CREDENTIALS = [
   {
@@ -122,7 +123,7 @@ export default function PlatformCredentialsForm() {
 
   return (
     <div className="max-w-lg">
-      <h2 className={`text-primary uppercase font-bold text-lg`}>Add your {platform.name} credentials</h2>
+      <Heading>Add your {platform.name} credentials</Heading>
       <p className="text-xs">Only stored locally. Encrypted in transit.</p>
 
       <form onSubmit={onSubmit}>
@@ -141,7 +142,7 @@ export default function PlatformCredentialsForm() {
                   name={value.name}
                   type="text"
                   required
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}
 
@@ -150,7 +151,7 @@ export default function PlatformCredentialsForm() {
                   required
                   id={value.name}
                   name={value.name}
-                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 >
                   {value.values?.map((v) => (
                     <option key={v} value={v}>
@@ -166,7 +167,7 @@ export default function PlatformCredentialsForm() {
         <div className="mt-6">
           <button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Validate credentials
           </button>

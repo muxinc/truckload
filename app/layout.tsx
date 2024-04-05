@@ -1,10 +1,15 @@
+import { DM_Sans, JetBrains_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
 
 import '@/_styles/globals.css';
+import clsx from 'clsx';
 
 export const metadata: Metadata = {
   title: 'Truckload - move your videos with ease',
 };
+
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--sans' });
+const jetBrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--mono' });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
-      <body className="p-4 font-sans">{children}</body>
+      <body className={clsx('p-4 font-sans', dmSans.variable, jetBrainsMono.variable)}>{children}</body>
     </html>
   );
 }

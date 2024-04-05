@@ -43,11 +43,14 @@ export default function Page() {
 
   return (
     <>
-      <div className="border-b-8 border-double mb-8 border-primary">
-        <Image src="/truckload.png" alt="Truckload Video" width={130} height={60} />
+      <div className="border-b-8 border-double mb-8 border-primary flex items-end gap-4">
+        <h1>
+          <Image src="/truckload.png" alt="Truckload Video" width={130} height={60} />
+          <span className="sr-only">Truckload Video Migration</span>
+        </h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-10" style={{ gridTemplateColumns: `320px 1fr` }}>
+      <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10">
         <Sidebar />
 
         <div>

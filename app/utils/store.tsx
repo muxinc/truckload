@@ -1,6 +1,8 @@
 'use client';
 
 import type {} from '@redux-devtools/extension';
+import type Image from 'next/image';
+import { ComponentPropsWithoutRef } from 'react';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -62,7 +64,7 @@ export type PlatformConfig = {
 
 interface Platform {
   name: string;
-  logo: () => JSX.Element;
+  logo: ComponentPropsWithoutRef<typeof Image>['src'];
   credentials?: PlatformCredentials | undefined;
   config?: PlatformConfig | undefined;
 }
