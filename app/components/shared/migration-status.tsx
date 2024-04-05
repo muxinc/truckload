@@ -2,6 +2,7 @@
 
 import usePartySocket from 'partysocket/react';
 import useMigrationStore from '@/utils/store';
+import Heading from '../heading';
 
 // import type { VideoWithMigrationStatus } from '@/utils/store';
 
@@ -43,7 +44,7 @@ export default function MigrationStatus() {
 
   return (
     <div>
-      <h1>Migration Status</h1>
+      <Heading>Migration Status</Heading>
       {job?.status}
 
       <div className="relative w-full overflow-auto">

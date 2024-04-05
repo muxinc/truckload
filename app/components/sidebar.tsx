@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 import useMigrationStore from '@/utils/store';
+import Heading from './heading';
 
 export default function Sidebar() {
   const sourcePlatform = useMigrationStore((state) => state.sourcePlatform);
@@ -26,21 +27,24 @@ export default function Sidebar() {
       useMigrationStore.setState({ job: { id, status: 'pending', progress: 0, videos: {} } });
 
       setCurrentStep('migration-status');
-      toast('Migration initiated', { icon: '👍' });
+      toast('Migrationtext-xl text-primary uppercaseinitiated', { icon: '👍' });
     } else {
       toast.error('Error initiating migration');
     }
   };
 
   return (
-    <div className="relative border-2 border-slate-200 rounded shadow-xl p-4">
-      <h2 className="font-bold">Moving list</h2>
+    <div className="w-full max-w-128 md:w-80 relative border-2 border-slate-200 rounded p-4 -mt-4">
+      <Heading>Moving list</Heading>
 
       <div className="flex flex-col gap-4 mt-10 mb-16">
         {!sourcePlatform && (
-          <div>
-            <p>Start over there ➡️</p>
-          </div>
+          <p className="text-sm text-gray-600">
+            This list will grow as you prepare your move.
+            <br />
+            Start over there <span className="hidden md:inline">➡️</span>
+            <span className="inline md:hidden">⬇️</span>
+          </p>
         )}
 
         {sourcePlatform && (
@@ -55,8 +59,10 @@ export default function Sidebar() {
                 setPlatform('source', null);
                 setCurrentStep('select-source');
               }}
+              className="text-3xl text-primary"
+              aria-label={`Remove ${sourcePlatform?.name} as source platform`}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -69,12 +75,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('source', { ...sourcePlatform, credentials: undefined });
                 setCurrentStep('set-source-credentials');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -87,12 +94,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setAssetFilter(null);
                 setCurrentStep('set-video-filter');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -105,12 +113,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', null);
                 setCurrentStep('select-destination');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -123,12 +132,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', { ...destinationPlatform, credentials: undefined });
                 setCurrentStep('set-destination-credentials');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -141,12 +151,13 @@ export default function Sidebar() {
             </div>
 
             <button
+              className="text-3xl text-primary"
               onClick={() => {
                 setPlatform('destination', { ...destinationPlatform, config: undefined });
                 setCurrentStep('set-import-settings');
               }}
             >
-              ❌
+              &times;
             </button>
           </div>
         )}
@@ -154,11 +165,11 @@ export default function Sidebar() {
 
       {currentStep === 'review' && (
         <button
-          className="font-sans uppercase rounded text-base bg-primary text-white py-4 px-8 font-semibold disabled:bg-gray-300 w-full"
+          className="font-sans uppercase rounded text-base bg-primary hover:bg-primary-dark focus-visible:bg-primary-dark text-white py-4 px-8 font-semibold disabled:bg-gray-300 w-full"
           disabled={currentStep !== 'review'}
           onClick={onSubmit}
         >
-          Place order
+          Move videos
         </button>
       )}
     </div>

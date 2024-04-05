@@ -1,5 +1,6 @@
 import useMigrationStore from '@/utils/store';
 import type { PlatformConfig } from '@/utils/store';
+import Heading from '../heading';
 
 const PLATFORM_METADATA_FIELDS = [
   {
@@ -7,7 +8,7 @@ const PLATFORM_METADATA_FIELDS = [
     fields: [
       {
         label: 'Encoding tier',
-        description: 'Select the encoding tier for your videos',
+        description: 'The encoding tier informs the cost, quality, and available platform features for the asset.',
         docsUrl: 'https://docs.mux.com/guides/use-encoding-tiers',
         name: 'encodingTier',
         type: 'select',
@@ -15,7 +16,8 @@ const PLATFORM_METADATA_FIELDS = [
       },
       {
         label: 'Max resolution tier',
-        description: 'Select the max resolution tier for your videos',
+        description:
+          'This field controls the maximum resolution that Mux will encode, store, and deliver your media in. Mux does not to automatically ingest content at 4K so that you can avoid unexpectedly high ingest bills',
         docsUrl: 'https://docs.mux.com/guides/stream-videos-in-4k',
         name: 'maxResolutionTier',
         type: 'select',
@@ -30,7 +32,8 @@ const PLATFORM_METADATA_FIELDS = [
       },
       {
         label: 'Playback policy',
-        description: 'Select the playback policy for your videos',
+        description:
+          'Playback policies allow you to control the different ways users can view and interact with your content.',
         docsUrl: 'https://docs.mux.com/guides/secure-video-playback',
         name: 'playbackPolicy',
         type: 'multi-checkbox',
@@ -65,7 +68,7 @@ export default function DestinationMetadata() {
 
   return (
     <form onSubmit={onSubmit}>
-      <h2 className={`text-primary uppercase font-bold text-lg`}>Choose your import settings</h2>
+      <Heading>Choose your import settings</Heading>
 
       <div className="flex flex-col gap-4 mb-10">
         {platformFields?.fields.map((field) => {
@@ -80,7 +83,7 @@ export default function DestinationMetadata() {
                     <select
                       id={field.name}
                       name={field.name}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                     >
                       {field.values?.map((value) => (
                         <option key={value} value={value}>
@@ -88,35 +91,89 @@ export default function DestinationMetadata() {
                         </option>
                       ))}
                     </select>
+                    {(field.description || field.docsUrl) && (
+                      <p className="text-gray-500 text-xs mt-2 max-w-80">
+                        {field.description}
+                        {field.docsUrl && (
+                          <>
+                            {' '}
+                            <a
+                              href={field.docsUrl}
+                              target="_blank"
+                              className="underline hover:no-underline focus:no-underline"
+                            >
+                              Read more
+                            </a>
+                          </>
+                        )}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
 
               {field.type === 'checkbox' && (
-                <div className="relative flex gap-x-3">
-                  <div className="flex h-6 items-center">
-                    <input
-                      type={field.type}
-                      name={field.name}
-                      id={field.name}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    />
+                <div className="">
+                  <div className="flex gap-x-3">
+                    <div className="flex h-6 items-center">
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        id={field.name}
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      />
+                    </div>
+                    <div className="text-sm leading-6">
+                      <label htmlFor="comments" className="font-medium text-gray-900">
+                        {field.label}
+                      </label>
+                    </div>
                   </div>
-                  <div className="text-sm leading-6">
-                    <label htmlFor="comments" className="font-medium text-gray-900">
-                      {field.label}
-                    </label>
-                    <p className="text-gray-500">{field.description}</p>
-                  </div>
+                  {(field.description || field.docsUrl) && (
+                    <p className="text-gray-500 mt-1 text-xs max-w-80">
+                      {field.description}
+                      {field.docsUrl && (
+                        <>
+                          {' '}
+                          <a
+                            href={field.docsUrl}
+                            target="_blank"
+                            className="underline hover:no-underline focus:no-underline"
+                          >
+                            Read more
+                          </a>
+                        </>
+                      )}
+                    </p>
+                  )}
                 </div>
               )}
 
-              {field.type === 'text' && <input type={field.type} name={field.name} id={field.name} />}
+              {field.type === 'text' && (
+                <div>
+                  <input type={field.type} name={field.name} id={field.name} />
+                  <p className="text-gray-500 text-xs mt-1 max-w-80">
+                    {field.description}
+                    {field.docsUrl && (
+                      <>
+                        {' '}
+                        <a
+                          href={field.docsUrl}
+                          target="_blank"
+                          className="underline hover:no-underline focus:no-underline"
+                        >
+                          Read more
+                        </a>
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
               {field.type === 'multi-checkbox' && (
                 <div>
-                  <fieldset>
+                  <fieldset className="text-sm">
                     <legend className="block text-sm font-medium leading-6 text-gray-900">{field.label}</legend>
-                    <div className="mt-2 grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-3">
+                    <div className="mt-2 flex flex-col sm:flex-row gap-y-4 gap-x-3 [justify-content:start]">
                       {field.values?.map((value) => (
                         <div key={value} className="flex items-center">
                           <input
@@ -126,13 +183,28 @@ export default function DestinationMetadata() {
                             type="checkbox"
                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                           />
-                          <label htmlFor={value} className="ml-3 min-w-0 flex-1 text-gray-500">
+                          <label htmlFor={value} className="ml-3 min-w-0">
                             {value}
                           </label>
                         </div>
                       ))}
                     </div>
                   </fieldset>
+                  <p className="text-gray-500 text-xs mt-2 max-w-80">
+                    {field.description}
+                    {field.docsUrl && (
+                      <>
+                        {' '}
+                        <a
+                          href={field.docsUrl}
+                          target="_blank"
+                          className="underline hover:no-underline focus:no-underline"
+                        >
+                          Read more
+                        </a>
+                      </>
+                    )}
+                  </p>
                 </div>
               )}
             </div>
@@ -142,7 +214,7 @@ export default function DestinationMetadata() {
 
       <button
         type="submit"
-        className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        className="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
       >
         Confirm and review
       </button>
