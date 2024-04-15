@@ -1,5 +1,6 @@
 import Mux from '@mux/mux-node';
 import { PlaybackPolicy } from '@mux/mux-node/resources';
+
 import { inngest } from '@/inngest/client';
 import { updateJobStatus } from '@/utils/job';
 
@@ -34,6 +35,10 @@ export const transferVideo = inngest.createFunction(
 
     if (config?.encodingTier) {
       payload = { ...payload, encoding_tier: config.encodingTier as any };
+    }
+
+    if (config?.testMode) {
+      payload = { ...payload, test: true };
     }
 
     const result = await mux.video.assets.create(payload);
