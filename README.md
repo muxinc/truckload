@@ -8,7 +8,11 @@ Moving your video collection with ease
 
 ### Start development server
 
-`yarn dev`
+`npm run start:dev`
+
+This will start server instances for the Next.js app, Inngest, PartyKit, and ngrok.
+
+## (optional) run servers independently
 
 ### Run local Inngest server
 
@@ -16,7 +20,7 @@ Moving your video collection with ease
 
 You can start a [local Inngest development server](https://www.inngest.com/docs/local-development) with the following command:
 
-`npx inngest-cli@latest dev`
+`npx --yes inngest-cli@latest dev`
 
 ### Run PartyKit server
 
@@ -49,6 +53,7 @@ To solve this, you can stand up a free, publicly-accessible tunnel URL using ngr
 
 ## Resources
 
+- [Api.video API reference](https://docs.api.video/reference)
 - [AWS SDK v3 API reference](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/)
 - [Mux API reference](https://docs.mux.com/api-reference)
 

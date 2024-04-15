@@ -1,7 +1,10 @@
 'use client';
 
+import clsx from 'clsx';
 import usePartySocket from 'partysocket/react';
+
 import useMigrationStore from '@/utils/store';
+
 import Heading from '../heading';
 
 // import type { VideoWithMigrationStatus } from '@/utils/store';
@@ -45,7 +48,7 @@ export default function MigrationStatus() {
   return (
     <div>
       <Heading>Migration Status</Heading>
-      {job?.status}
+      {/* {job?.status} */}
 
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">
@@ -75,7 +78,19 @@ export default function MigrationStatus() {
                     {video.title || video.id}
                   </td>
                   <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.progress}%</td>
-                  <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{video.status}</td>
+                  <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
+                    <span
+                      className={clsx(
+                        'rounded-full px-3 py-1 capitalize text-xs',
+                        video.status === 'pending' && 'bg-orange-400 text-white',
+                        video.status === 'failed' && 'bg-red-400 text-white',
+                        video.status === 'in-progress' && 'bg-blue-400 text-white',
+                        video.status === 'completed' && 'bg-green-400 text-white'
+                      )}
+                    >
+                      {video.status}
+                    </span>
+                  </td>
                 </tr>
               );
             })}
@@ -83,7 +98,7 @@ export default function MigrationStatus() {
         </table>
       </div>
 
-      <button className="text-red-800 text-sm block" onClick={clearJob}>
+      <button className="text-red-800 text-sm block mt-4" onClick={clearJob}>
         Clear job
       </button>
     </div>
