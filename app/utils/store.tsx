@@ -1,8 +1,10 @@
 'use client';
 
-import type {} from '@redux-devtools/extension';
-import type Image from 'next/image';
 import { ComponentPropsWithoutRef } from 'react';
+
+import type Image from 'next/image';
+
+import type {} from '@redux-devtools/extension';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -59,7 +61,7 @@ export interface DestinationPlatform extends Platform {
 
 type PlatformType = 'source' | 'destination';
 export type PlatformConfig = {
-  [key: string]: string;
+  [key: string]: string | string[];
 };
 
 interface Platform {

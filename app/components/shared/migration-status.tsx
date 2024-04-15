@@ -49,6 +49,7 @@ export default function MigrationStatus() {
     <div>
       <Heading>Migration Status</Heading>
       {/* {job?.status} */}
+      <p className="text-xs mb-2">Note: this page will only update if you've correctly configured status webhooks.</p>
 
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">

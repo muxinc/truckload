@@ -1,5 +1,7 @@
 import toast from 'react-hot-toast';
+
 import useMigrationStore from '@/utils/store';
+
 import Heading from './heading';
 
 export default function Sidebar() {
@@ -144,7 +146,7 @@ export default function Sidebar() {
         )}
 
         {destinationPlatform?.config && (
-          <div className="flex justify-between border-b border-slate-200 pb-2">
+          <div className="flex justify-between border-slate-200 pb-2">
             <div className="flex flex-col">
               <h3 className="font-semibold text-sm">Import settings</h3>
               <p className="text-sm">Settings added</p>
