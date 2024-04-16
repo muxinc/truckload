@@ -20,8 +20,14 @@ export const transferVideo = inngest.createFunction(
 
     const config = event.data.encrypted.destinationPlatform.config;
 
+    let input: Mux.Video.Assets.AssetCreateParams.Input[] = [{ url: event.data.encrypted.video.url }];
+
+    if (config?.autoGenerateCaptions) {
+      input[0].generated_subtitles = [{ name: 'English', language_code: 'en' }];
+    }
+
     let payload: Mux.Video.Assets.AssetCreateParams = {
-      input: [{ url: event.data.encrypted.video.url }],
+      input,
       passthrough: JSON.stringify({ jobId: event.data.jobId, sourceVideoId: event.data.encrypted.video.id }),
     };
 
