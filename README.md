@@ -1,10 +1,10 @@
 # Truckload
 
-Moving your video collection with ease
+Truckload helps you migrate your video collection to a new platform with ease.
 
 <img src="public/truckload.png" alt="Truckload" width="200px">
 
-## How to use
+## How it works
 
 ### Start development server
 
@@ -51,16 +51,39 @@ To solve this, you can stand up a free, publicly-accessible tunnel URL using ngr
 
 <img src="public/screenshots/ngrok-url.png" alt="Ngrok URL" width="500px">
 
+## Authentication requirements
+
+### Amazon S3
+
+You'll need an [AWS Access Key and Secret](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) with read access to connect your account.
+
+#### Bucket Name
+
+This value can be found in the AWS console and is used to look up your S3 bucket.
+
+#### Region
+
+This value can be found in the AWS console and is used to look up your S3 bucket region.
+
+### Api.video
+
+You'll need an [Api.video API Key](https://docs.api.video/reference/basic-authentication) with write access to connect your account.
+
+### Cloudflare Stream
+
+You'll need an [API Token](https://dash.cloudflare.com/profile/api-tokens) with write access to connect your account.
+
+#### Account ID
+
+This value can be found in the dashboard sidebar and is used to look up your Stream account.
+
+### Mux
+
+You'll need an [Mux Token ID and Secret](https://docs.mux.com/core/make-api-requests#http-basic-auth) with write access to connect your account.
+
 ## Resources
 
 - [Api.video API reference](https://docs.api.video/reference)
 - [AWS SDK v3 API reference](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/)
+- [Cloudflare Stream API reference](https://developers.cloudflare.com/stream/)
 - [Mux API reference](https://docs.mux.com/api-reference)
-
-## Cloudflare Stream
-
-You'll need an [API Token](https://dash.cloudflare.com/profile/api-tokens) with write access to connect your account.
-
-### Account ID
-
-This value can be found in the dashboard sidebar and is used to find your Stream account.
