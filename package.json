@@ -14,7 +14,7 @@
     "inngest": "npx --yes inngest-cli@latest dev",
     "partykit": "cd app && npx partykit dev",
     "ngrok": "ngrok http http://localhost:3000",
-    "start:dev": "concurrently --names \"NEXTJS,INNGEST,PARTYKIT,NGROK\" \"npm run dev\" \"npm run inngest\" \"npm run partykit\" \"npm run ngrok\""
+    "start:dev": "concurrently -c \"white,#6366f1,red,#022384\" --names \"NEXT.JS,INNGEST,PARTYKIT,NGROK\" \"npm run dev\" \"npm run inngest\" \"npm run partykit\" \"npm run ngrok\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
