@@ -45,7 +45,7 @@ export default function Page() {
     <>
       <div className="border-b-8 border-double mb-8 border-primary flex items-end gap-4">
         <h1>
-          <Image src="/truckload.png" alt="Truckload Video" width={130} height={60} />
+          <Image src="/truck.png" alt="Truckload Video" width={130} height={60} />
           <span className="sr-only">Truckload Video Migration</span>
         </h1>
       </div>

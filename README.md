@@ -1,8 +1,8 @@
-# Truckload
-
-Truckload helps you migrate your video collection to a new platform with ease.
-
-<img src="public/truckload.png" alt="Truckload" width="200px">
+<div style="text-align: center">
+<img style="margin: 1em 0;" src="public/truck.png" alt="Truckload" width="150px">
+<p style="font-size: 2.5em; font-weight: bold; margin-bottom: 0;">Truckload</p>
+<p style="font-size: 1.25em;">Migrate your video collection to a new platform with ease.</p>
+</div>
 
 ## How it works
 
