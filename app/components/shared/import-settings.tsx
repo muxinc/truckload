@@ -78,12 +78,12 @@ export default function DestinationMetadata() {
   const platform = useMigrationStore((state) =>
     state.currentStep === 'set-import-settings' ? state.destinationPlatform : state.sourcePlatform
   );
+  const [config, setConfig] = useState<PlatformConfig>({ encodingTier: 'baseline' });
 
   if (!platform) {
     return null;
   }
 
-  const [config, setConfig] = useState<PlatformConfig>({ encodingTier: 'baseline' });
   const platformFields = PLATFORM_METADATA_FIELDS.find((field) => field.id === destinationPlatform?.id);
 
   const handleFieldChange = (field: Field, value: any) => {
