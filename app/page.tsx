@@ -43,28 +43,42 @@ export default function Page() {
 
   return (
     <>
-      <div className="border-b-8 border-double mb-8 border-primary flex items-end gap-4">
-        <h1>
-          <Image src="/truck.png" alt="Truckload Video" width={130} height={60} />
-          <span className="sr-only">Truckload Video Migration</span>
-        </h1>
-      </div>
+      <div className="flex flex-col min-h-screen p-4">
+        <div className="border-b-8 border-double mb-8 border-primary flex items-end gap-4">
+          <h1>
+            <Image src="/truck.png" alt="Truckload Video" width={130} height={60} />
+            <span className="sr-only">Truckload Video Migration</span>
+          </h1>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10">
-        <Sidebar />
+        <div className="flex-grow grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10">
+          <Sidebar />
 
-        <div>
-          {currentStep === 'select-source' && <PlatformList type="source" />}
-          {currentStep === 'set-source-credentials' && sourcePlatform && <PlatformCredentialsForm />}
-          {currentStep === 'set-video-filter' && <VideoFilter />}
-          {currentStep === 'select-destination' && <PlatformList type="destination" />}
-          {currentStep === 'set-destination-credentials' && destinationPlatform && <PlatformCredentialsForm />}
-          {currentStep === 'set-import-settings' && <ImportSettings />}
-          {currentStep === 'review' && <Review />}
-          {currentStep === 'migration-status' && <MigrationStatus />}
+          <div>
+            {currentStep === 'select-source' && <PlatformList type="source" />}
+            {currentStep === 'set-source-credentials' && sourcePlatform && <PlatformCredentialsForm />}
+            {currentStep === 'set-video-filter' && <VideoFilter />}
+            {currentStep === 'select-destination' && <PlatformList type="destination" />}
+            {currentStep === 'set-destination-credentials' && destinationPlatform && <PlatformCredentialsForm />}
+            {currentStep === 'set-import-settings' && <ImportSettings />}
+            {currentStep === 'review' && <Review />}
+            {currentStep === 'migration-status' && <MigrationStatus />}
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-4 mt-auto">
+          <span className="text-slate-500 text-sm">
+            An{' '}
+            <a href="https://github.com/muxinc/truckload" target="_blank" rel="noreferrer" className="text-primary">
+              open-source
+            </a>{' '}
+            project by{' '}
+            <a href="https://mux.com" target="_blank" rel="noreferrer" className="text-primary">
+              Mux
+            </a>
+          </span>
         </div>
       </div>
-
       <Toaster />
     </>
   );

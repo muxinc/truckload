@@ -1,8 +1,9 @@
-import { DM_Sans, JetBrains_Mono } from 'next/font/google';
 import type { Metadata } from 'next';
+import { DM_Sans, JetBrains_Mono } from 'next/font/google';
+
+import clsx from 'clsx';
 
 import '@/_styles/globals.css';
-import clsx from 'clsx';
 
 export const metadata: Metadata = {
   title: 'Truckload - move your videos with ease',
@@ -20,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
       </head>
-      <body className={clsx('p-4 font-sans', dmSans.variable, jetBrainsMono.variable)}>{children}</body>
+      <body className={clsx('font-sans', dmSans.variable, jetBrainsMono.variable)}>{children}</body>
     </html>
   );
 }
