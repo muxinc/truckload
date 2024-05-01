@@ -52,8 +52,6 @@ export const transferVideo = inngest.createFunction(
       payload = { ...payload, test: true };
     }
 
-    console.log(payload);
-
     const result = await mux.video.assets.create(payload);
 
     await updateJobStatus(event.data.jobId, 'migration.video.progress', {
