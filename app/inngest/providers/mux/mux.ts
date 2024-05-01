@@ -36,7 +36,12 @@ export const transferVideo = inngest.createFunction(
     }
 
     if (config?.playbackPolicy) {
-      payload = { ...payload, playback_policy: [config.playbackPolicy as PlaybackPolicy] };
+      payload = {
+        ...payload,
+        playback_policy: Array.isArray(config.playbackPolicy)
+          ? (config.playbackPolicy as PlaybackPolicy[])
+          : ([config.playbackPolicy] as PlaybackPolicy[]),
+      };
     }
 
     if (config?.encodingTier) {
@@ -46,6 +51,8 @@ export const transferVideo = inngest.createFunction(
     if (config?.testMode) {
       payload = { ...payload, test: true };
     }
+
+    console.log(payload);
 
     const result = await mux.video.assets.create(payload);
 
