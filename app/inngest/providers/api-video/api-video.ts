@@ -1,7 +1,10 @@
+import { NonRetriableError } from 'inngest';
+
 import { inngest } from '@/inngest/client';
 import type { Video } from '@/utils/store';
-import type { ListVideosRoot, ApiVideoVideo } from './types';
-import { SANDBOX_ENDPOINT, PRODUCTION_ENDPOINT } from './constants';
+
+import { PRODUCTION_ENDPOINT, SANDBOX_ENDPOINT } from './constants';
+import type { ApiVideoVideo, ListVideosRoot } from './types';
 
 export const fetchPage = inngest.createFunction(
   { id: 'fetch-page-api-video', name: 'Fetch page - Api.video', concurrency: 1 },
@@ -57,7 +60,9 @@ export const fetchVideo = inngest.createFunction(
         url: result.assets.mp4,
       };
     }
+
     // todo: enable mp4 support if it isn't enabled on the asset
     // similar to how cloudflare stream works
+    throw new NonRetriableError('Only videos with MP4s enabled are supported at this time');
   }
 );
