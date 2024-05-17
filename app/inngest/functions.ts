@@ -1,8 +1,10 @@
 import type { GetEvents } from 'inngest';
-import type { Video } from '@/utils/store';
-import { inngest } from './client';
+
 import { updateJobStatus } from '@/utils/job';
+import type { Video } from '@/utils/store';
 import type { VideoWithMigrationStatus } from '@/utils/store';
+
+import { inngest } from './client';
 import providerFns from './providers';
 
 type Events = GetEvents<typeof inngest>;
@@ -50,7 +52,7 @@ export const processVideo = inngest.createFunction(
 export const initiateMigration = inngest.createFunction(
   { id: 'initiate-migration' },
   { event: 'truckload/migration.init' },
-  async ({ event, step }) => {
+  async ({ event, step, logger }) => {
     let jobId = event.id;
     let hasMorePages = true;
     let page = 1;
@@ -58,7 +60,7 @@ export const initiateMigration = inngest.createFunction(
     let nextPageToken: string | null | undefined = undefined;
     let videoList: Video[] = [];
 
-    console.log('jobId: ' + jobId);
+    logger.info('jobId: ' + jobId);
 
     // use the source platform id to conditionally set the fetch page function
     const sourcePlatformId = event.data.encrypted.sourcePlatform.id;
@@ -76,18 +78,20 @@ export const initiateMigration = inngest.createFunction(
       videoList = videoList.concat(videos);
       nextPageToken = cursor;
 
-      console.log('page: ' + page);
-      console.log('cursor: ' + cursor);
-      console.log('isTruncated: ' + isTruncated);
-      console.log('videos: ' + JSON.stringify(videos));
+      logger.info('page: ' + page);
+      logger.info('cursor: ' + cursor);
+      logger.info('isTruncated: ' + isTruncated);
+      logger.info('videos: ' + JSON.stringify(videos));
 
-      await updateJobStatus(jobId!, 'migration.videos.fetched', {
-        pageNumber: page,
-        videos: videoList.reduce<Record<string, VideoWithMigrationStatus>>((acc, video) => {
-          acc[video.id] = { ...video, status: 'pending', progress: 0 };
-          return acc;
-        }, {}),
-        hasMorePages: isTruncated,
+      await step.run('update-job-status-with-videos-fetched', async () => {
+        await updateJobStatus(jobId!, 'migration.videos.fetched', {
+          pageNumber: page,
+          videos: videoList.reduce<Record<string, VideoWithMigrationStatus>>((acc, video) => {
+            acc[video.id] = { ...video, status: 'pending', progress: 0 };
+            return acc;
+          }, {}),
+          hasMorePages: isTruncated,
+        });
       });
 
       if (!isTruncated) {
