@@ -44,8 +44,8 @@ export const transferVideo = inngest.createFunction(
       };
     }
 
-    if (config?.encodingTier) {
-      payload = { ...payload, encoding_tier: config.encodingTier as any };
+    if (config?.videoQuality) {
+      payload = { ...payload, video_quality: config.videoQuality as any };
     }
 
     if (config?.testMode) {
