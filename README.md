@@ -57,6 +57,7 @@ Here's a list of the authentication requirements for each service:
 | Amazon S3         | [Access Key and Secret](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys), bucket name, region | [AWS SDK v3 API docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/) |
 | Api.video         | [API Key](https://docs.api.video/reference/basic-authentication)                                                                                       | [API docs](https://docs.api.video/reference)                                             |
 | Cloudflare Stream | [API Token](https://dash.cloudflare.com/profile/api-tokens), Account ID                                                                                | [API docs](https://developers.cloudflare.com/stream/)                                    |
+| Vimeo             | [Access Token](https://developer.vimeo.com/api/authentication#obtaining-an-access-token)                                                               | [API docs](https://developer.vimeo.com/api/)                                             |
 | Mux               | [Token ID and Secret](https://docs.mux.com/core/make-api-requests#http-basic-auth)                                                                     | [API docs](https://docs.mux.com/api-reference)                                           |
 
 ## Handling webhooks
@@ -72,6 +73,6 @@ To solve this, you can stand up a free, publicly-accessible tunnel URL using ngr
 2. Sign in with your existing account or with GitHub
 3. Follow the instructions to install and authenticate `ngrok` on your machine
 4. Create an `ngrok` endpoint for your local app by running `ngrok http http://localhost:3000`
-5. Grab the resulting URL for use as your webhook destination, and append `/api/webhooks/[provider]`:
+5. Grab the resulting URL for use as your webhook destination, and append `/api/webhooks/mux`:
 
 <img src="public/screenshots/ngrok-url.png" alt="Ngrok URL" width="600px">

@@ -6,6 +6,7 @@ import LogoApiVideo from '@/components/platforms/api-video/logo.svg';
 import LogoCloudflare from '@/components/platforms/cloudflare/logo.svg';
 import LogoMux from '@/components/platforms/mux/logo.svg';
 import LogoS3 from '@/components/platforms/s3/logo.svg';
+import LogoVimeo from '@/components/platforms/vimeo/logo.svg';
 import useMigrationStore from '@/utils/store';
 import { DestinationPlatform, SourcePlatform } from '@/utils/store';
 
@@ -27,6 +28,11 @@ const PLATFORMS: Platforms = {
       id: 'api-video',
       name: 'Api.video',
       logo: LogoApiVideo,
+    },
+    {
+      id: 'vimeo',
+      name: 'Vimeo',
+      logo: LogoVimeo,
     },
     {
       id: 'cloudflare-stream',

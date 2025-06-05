@@ -2,9 +2,9 @@ import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 
 import Mux from '@mux/mux-node';
 
-import validateApiVideoCredentials from './api-video';
-
 import type { PlatformCredentials } from '@/utils/store';
+
+import validateApiVideoCredentials from './api-video';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +15,21 @@ export async function POST(request: Request) {
     case 'api-video': {
       const result = await validateApiVideoCredentials(data);
       return result;
+    }
+    case 'vimeo': {
+      const response = await fetch(`https://api.vimeo.com`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${data.secretKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await response.json();
+      if (result.endpoints) {
+        return new Response('ok', { status: 200 });
+      } else {
+        return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+      }
     }
     case 'cloudflare-stream':
       try {

@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 
 import useMigrationStore from '@/utils/store';
 import type { PlatformCredentials } from '@/utils/store';
+
 import Heading from '../heading';
 
 const PLATFORM_CREDENTIALS = [
@@ -75,6 +76,17 @@ const PLATFORM_CREDENTIALS = [
       },
       {
         label: 'API Token',
+        name: 'secretKey',
+        type: 'text',
+      },
+    ],
+  },
+  {
+    name: 'Vimeo',
+    id: 'vimeo',
+    values: [
+      {
+        label: 'Access Token',
         name: 'secretKey',
         type: 'text',
       },
