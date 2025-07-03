@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 
 import useMigrationStore from '@/utils/store';
 import type { PlatformCredentials } from '@/utils/store';
+
 import Heading from '../heading';
 
 const PLATFORM_CREDENTIALS = [
@@ -25,6 +26,7 @@ const PLATFORM_CREDENTIALS = [
         type: 'select',
         values: [
           'us-east-1',
+          'us-east-2',
           'us-west-1',
           'us-west-2',
           'eu-west-1',
