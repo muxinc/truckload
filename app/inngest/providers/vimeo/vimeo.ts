@@ -52,15 +52,23 @@ export const fetchVideo = inngest.createFunction(
       throw new NonRetriableError('Error fetching video from Vimeo');
     }
 
-    if (result.download && result.status === 'available') {
+    if (result.download && result.status === 'available' && result.type === 'video') {
       // Find highest quality MP4 download link if source is not available
       const download = result.download.find(
         (file) =>
-          file.quality === 'source' ||
-          file.quality === 'uhd' ||
-          file.quality === 'hd' ||
-          file.quality === 'sd' ||
-          file.quality === 'mobile'
+          file.rendition === 'source' ||
+          file.rendition === '8k' ||
+          file.rendition === '7k' ||
+          file.rendition === '6k' ||
+          file.rendition === '5k' ||
+          file.rendition === '4k' ||
+          file.rendition === '2k' ||
+          file.rendition === '1080p' ||
+          file.rendition === '720p' ||
+          file.rendition === '540p' ||
+          file.rendition === '480p' ||
+          file.rendition === '360p' ||
+          file.rendition === '240p'
       );
 
       return {

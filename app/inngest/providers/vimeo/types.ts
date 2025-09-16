@@ -112,6 +112,7 @@ export interface VimeoVideo {
     height: number;
     expires: string;
     link: string;
+    rendition: string;
     created_time: string;
   }[];
   files?: {
