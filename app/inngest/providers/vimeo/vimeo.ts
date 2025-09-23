@@ -24,8 +24,16 @@ export const fetchPage = inngest.createFunction(
 
     const videos =
       result.data
-        ?.map((object: VimeoVideo) => ({ id: object.uri, title: object.name }))
-        .filter((item: Video): item is Video => !!item.id) || [];
+        ?.map((object: VimeoVideo) => ({
+          id: object.uri,
+          title: object.name,
+          status: object.status,
+          type: object.type,
+        }))
+        .filter(
+          (item: Video & { status?: string; type?: string }): item is Video =>
+            !!item.id && !(item.status !== 'available' && item.type !== 'video')
+        ) || [];
 
     const payload = { isTruncated, videos, cursor: null };
     return payload;
