@@ -10,7 +10,15 @@ import providerFns from './providers';
 type Events = GetEvents<typeof inngest>;
 
 export const processVideo = inngest.createFunction(
-  { id: 'process-video', name: 'Process video' },
+  {
+    id: 'process-video',
+    name: 'Process video',
+    throttle: {
+      limit: 1,
+      period: '2s',
+      burst: 2,
+    },
+  },
   { event: 'truckload/video.process' },
   async ({ event, step }) => {
     const videoData = event.data.encrypted.video;
@@ -72,6 +80,7 @@ export const initiateMigration = inngest.createFunction(
         data: {
           jobId: jobId!,
           encrypted: event.data.encrypted.sourcePlatform.credentials,
+          page: page,
         },
       });
 

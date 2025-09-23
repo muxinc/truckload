@@ -17,6 +17,7 @@ type FetchPage = {
   data: {
     jobId: string;
     encrypted: PlatformCredentials;
+    page?: number;
   };
 };
 

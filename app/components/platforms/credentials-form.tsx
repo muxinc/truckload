@@ -83,6 +83,17 @@ const PLATFORM_CREDENTIALS = [
     ],
   },
   {
+    name: 'Vimeo',
+    id: 'vimeo',
+    values: [
+      {
+        label: 'Access Token',
+        name: 'secretKey',
+        type: 'text',
+      },
+    ],
+  },
+  {
     name: 'Mux',
     id: 'mux',
     values: [

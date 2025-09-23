@@ -50,7 +50,7 @@ export type PlatformCredentials = {
 };
 
 export interface SourcePlatform extends Platform {
-  id: 's3' | 'cloudflare-stream' | 'api-video';
+  id: 's3' | 'cloudflare-stream' | 'api-video' | 'vimeo';
   type: 'source';
 }
 
