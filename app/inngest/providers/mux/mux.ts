@@ -28,6 +28,10 @@ export const transferVideo = inngest.createFunction(
 
     let payload: Mux.Video.Assets.AssetCreateParams = {
       input,
+      meta: {
+        external_id: event.data.encrypted.video.id,
+        title: event.data.encrypted.video.title || event.data.encrypted.video.id,
+      },
       passthrough: JSON.stringify({ jobId: event.data.jobId, sourceVideoId: event.data.encrypted.video.id }),
     };
 

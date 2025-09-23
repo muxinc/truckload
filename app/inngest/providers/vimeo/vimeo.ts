@@ -82,6 +82,7 @@ export const fetchVideo = inngest.createFunction(
       return {
         id: event.data.encrypted.video.id,
         url: download?.link,
+        title: result?.name,
       };
     }
     return;
