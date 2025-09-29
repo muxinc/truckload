@@ -75,7 +75,7 @@ export const initiateMigration = inngest.createFunction(
     const fetchPageFn = providerFns[sourcePlatformId].fetchPage;
 
     while (hasMorePages && event.data.encrypted.sourcePlatform.credentials) {
-      const { cursor, isTruncated, videos } = await step.invoke(`fetch-page-${page}`, {
+      const { cursor, isTruncated, videos } = await step.invoke(`fetch-page`, {
         function: fetchPageFn,
         data: {
           jobId: jobId!,
