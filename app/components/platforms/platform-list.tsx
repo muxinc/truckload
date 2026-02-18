@@ -7,6 +7,7 @@ import LogoCloudflare from '@/components/platforms/cloudflare/logo.svg';
 import LogoMux from '@/components/platforms/mux/logo.svg';
 import LogoS3 from '@/components/platforms/s3/logo.svg';
 import LogoVimeo from '@/components/platforms/vimeo/logo.svg';
+import LogoWistia from '@/components/platforms/wistia/logo.svg';
 import useMigrationStore from '@/utils/store';
 import { DestinationPlatform, SourcePlatform } from '@/utils/store';
 
@@ -33,6 +34,11 @@ const PLATFORMS: Platforms = {
       id: 'vimeo',
       name: 'Vimeo',
       logo: LogoVimeo,
+    },
+    {
+      id: 'wistia',
+      name: 'Wistia',
+      logo: LogoWistia,
     },
     {
       id: 'cloudflare-stream',

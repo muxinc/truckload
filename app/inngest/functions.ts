@@ -41,6 +41,10 @@ export const processVideo = inngest.createFunction(
       },
     });
 
+    if (!video) {
+      throw new Error(`Failed to fetch video with ID: ${videoData.id}`);
+    }
+
     const transfer = await step.invoke(`transfer-video-${videoData.id}`, {
       function: transferVideoFn,
       data: {
