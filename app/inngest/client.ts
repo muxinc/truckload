@@ -57,6 +57,7 @@ const mw = encryptionMiddleware({
 
 export const inngest = new Inngest({
   id: 'truckload-video',
+  ...(process.env.NODE_ENV !== 'development' && { eventKey: process.env.INNGEST_EVENT_KEY }),
   middleware: [mw],
   schemas: new EventSchemas().fromRecord<Events>(),
 });
