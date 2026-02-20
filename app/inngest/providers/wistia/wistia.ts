@@ -1,4 +1,4 @@
-import { NonRetriableError } from 'inngest/components/NonRetriableError';
+import { NonRetriableError } from 'inngest';
 
 import { inngest } from '@/inngest/client';
 
