@@ -94,6 +94,17 @@ const PLATFORM_CREDENTIALS = [
     ],
   },
   {
+    name: 'Wistia',
+    id: 'wistia',
+    values: [
+      {
+        label: 'Access Token',
+        name: 'secretKey',
+        type: 'text',
+      },
+    ],
+  },
+  {
     name: 'Mux',
     id: 'mux',
     values: [

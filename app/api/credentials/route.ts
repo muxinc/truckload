@@ -16,6 +16,21 @@ export async function POST(request: Request) {
       const result = await validateApiVideoCredentials(data);
       return result;
     }
+    case 'wistia': {
+      const response = await fetch(`https://api.wistia.com/modern/account`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${data.secretKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await response.json();
+      if (result.id) {
+        return new Response('ok', { status: 200 });
+      } else {
+        return Response.json({ error: 'Invalid credentials' }, { status: 401 });
+      }
+    }
     case 'vimeo': {
       const response = await fetch(`https://api.vimeo.com`, {
         method: 'GET',
