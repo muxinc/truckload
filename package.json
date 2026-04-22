@@ -33,7 +33,7 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "husky": "^8.0.3",
     "immer": "^10.0.4",
-    "inngest": "^3.52.1",
+    "inngest": "^3.54.0",
     "next": "^14.0.2",
     "partysocket": "1.0.0",
     "prettier": "^3.2.5",
