@@ -37,3 +37,7 @@ next-env.d.ts
 # partykit
 app/.partykit
 app/node_modules
+
+# workflow
+.workflow-data
+.workflow-vitest

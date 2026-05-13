@@ -26,13 +26,13 @@ Finally, start the app:
 npm run start:dev
 ```
 
-This will start server instances for the Next.js app, Inngest, PartyKit, and ngrok.
+This will start server instances for the Next.js app, PartyKit, and ngrok.
 
 <img src="public/stack.png" alt="Truckload stack" width="600px">
 
-### About the Inngest server
+### About Workflow
 
-[Inngest](https://www.inngest.com) makes serverless queues, background jobs, and workflows effortless. Truckload uses a [local Inngest development server](https://www.inngest.com/docs/local-development) to facilitate the loading and migrating of each video.
+Truckload uses the [Vercel Workflow SDK](https://vercel.com/docs/workflow) to orchestrate video migration jobs. Workflows and steps are defined using `'use workflow'` and `'use step'` directives. In development, workflows run locally via the built-in workflow runtime.
 
 ### About the PartyKit server
 

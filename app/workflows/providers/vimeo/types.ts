@@ -28,7 +28,7 @@ export interface VimeoVideo {
   uri: string;
   name: string;
   description: string | null;
-  type: string; // e.g., "video"
+  type: string;
   link: string;
   duration: number;
   width: number;
@@ -103,7 +103,7 @@ export interface VimeoVideo {
       resource_key: string;
       default_picture: boolean;
     };
-    account: string; // e.g., "basic", "plus", "pro"
+    account: string;
   };
   download?: {
     quality: string;
