@@ -1,9 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import * as ApiVideo from '../providers/api-video/api-video';
-import * as CloudflareStream from '../providers/cloudflare-stream/cloudflare-stream';
-import * as Vimeo from '../providers/vimeo/vimeo';
-import * as Wistia from '../providers/wistia/wistia';
+import {
+  checkCloudflareStatus,
+  fetchPageApiVideo,
+  fetchPageCloudflare,
+  fetchPageVimeo,
+  fetchPageWistia,
+  fetchVideoApiVideo,
+  fetchVideoCloudflare,
+  fetchVideoVimeo,
+  fetchVideoWistia,
+} from '../steps';
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -30,7 +37,7 @@ describe('Api.video provider', () => {
         }),
     });
 
-    const result = await ApiVideo.fetchPage({
+    const result = await fetchPageApiVideo({
       publicKey: 'pub',
       secretKey: 'secret',
       additionalMetadata: { environment: 'sandbox' },
@@ -54,7 +61,7 @@ describe('Api.video provider', () => {
         }),
     });
 
-    const result = await ApiVideo.fetchVideo({ publicKey: 'pub', secretKey: 'secret' }, { id: 'v1' });
+    const result = await fetchVideoApiVideo({ publicKey: 'pub', secretKey: 'secret' }, { id: 'v1' });
 
     expect(result).toEqual({ id: 'v1', url: 'https://cdn.api.video/v1.mp4' });
   });
@@ -64,7 +71,7 @@ describe('Api.video provider', () => {
       json: () => Promise.resolve({ mp4Support: false }),
     });
 
-    await expect(ApiVideo.fetchVideo({ publicKey: 'pub', secretKey: 'secret' }, { id: 'v1' })).rejects.toThrow(
+    await expect(fetchVideoApiVideo({ publicKey: 'pub', secretKey: 'secret' }, { id: 'v1' })).rejects.toThrow(
       'Only videos with MP4s enabled are supported'
     );
   });
@@ -80,7 +87,7 @@ describe('Cloudflare Stream provider', () => {
         }),
     });
 
-    const result = await CloudflareStream.fetchPage({
+    const result = await fetchPageCloudflare({
       publicKey: 'account-id',
       secretKey: 'api-token',
     });
@@ -97,10 +104,7 @@ describe('Cloudflare Stream provider', () => {
         }),
     });
 
-    const result = await CloudflareStream.fetchVideo(
-      { publicKey: 'account-id', secretKey: 'api-token' },
-      { id: 'cf-1' }
-    );
+    const result = await fetchVideoCloudflare({ publicKey: 'account-id', secretKey: 'api-token' }, { id: 'cf-1' });
 
     expect(result).toEqual({ id: 'cf-1', url: 'https://download.cloudflare.com/v.mp4' });
   });
@@ -113,15 +117,12 @@ describe('Cloudflare Stream provider', () => {
         }),
     });
 
-    const result = await CloudflareStream.fetchVideo(
-      { publicKey: 'account-id', secretKey: 'api-token' },
-      { id: 'cf-1' }
-    );
+    const result = await fetchVideoCloudflare({ publicKey: 'account-id', secretKey: 'api-token' }, { id: 'cf-1' });
 
     expect(result.needsPolling).toBe(true);
   });
 
-  it('checkSourceStatus returns status', async () => {
+  it('checkCloudflareStatus returns status', async () => {
     mockFetch.mockResolvedValueOnce({
       json: () =>
         Promise.resolve({
@@ -129,10 +130,7 @@ describe('Cloudflare Stream provider', () => {
         }),
     });
 
-    const result = await CloudflareStream.checkSourceStatus(
-      { publicKey: 'account-id', secretKey: 'api-token' },
-      { id: 'cf-1' }
-    );
+    const result = await checkCloudflareStatus({ publicKey: 'account-id', secretKey: 'api-token' }, { id: 'cf-1' });
 
     expect(result.ready).toBe(true);
     expect(result.url).toBe('https://download.cloudflare.com/v.mp4');
@@ -154,7 +152,7 @@ describe('Vimeo provider', () => {
         }),
     });
 
-    const result = await Vimeo.fetchPage({ publicKey: '', secretKey: 'token' });
+    const result = await fetchPageVimeo({ publicKey: '', secretKey: 'token' }, 1);
 
     expect(result.videos).toHaveLength(2);
     expect(result.isTruncated).toBe(false);
@@ -172,7 +170,7 @@ describe('Vimeo provider', () => {
         }),
     });
 
-    const result = await Vimeo.fetchVideo({ publicKey: '', secretKey: 'token' }, { id: '/videos/1' });
+    const result = await fetchVideoVimeo({ publicKey: '', secretKey: 'token' }, { id: '/videos/1' });
 
     expect(result).toEqual({
       id: '/videos/1',
@@ -195,7 +193,7 @@ describe('Wistia provider', () => {
         ]),
     });
 
-    const result = await Wistia.fetchPage({ publicKey: '', secretKey: 'token' });
+    const result = await fetchPageWistia({ publicKey: '', secretKey: 'token' }, 1);
 
     expect(result.videos).toHaveLength(1);
     expect(result.videos[0].id).toBe('w1');
@@ -204,7 +202,7 @@ describe('Wistia provider', () => {
 
   it('fetchVideo returns the video as-is', async () => {
     const video = { id: 'w1', url: 'https://wistia.com/w1.mp4' };
-    const result = await Wistia.fetchVideo({ publicKey: '', secretKey: 'token' }, video);
+    const result = await fetchVideoWistia({ publicKey: '', secretKey: 'token' }, video);
     expect(result).toEqual(video);
   });
 });

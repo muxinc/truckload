@@ -19,7 +19,7 @@ type FetchPageResult = { isTruncated: boolean | undefined; videos: Video[]; curs
 
 // --- Fetch Page implementations ---
 
-async function fetchPageApiVideo(credentials: PlatformCredentials): Promise<FetchPageResult> {
+export async function fetchPageApiVideo(credentials: PlatformCredentials): Promise<FetchPageResult> {
   const endpoint = getApiVideoEndpoint(credentials);
   const response = await fetch(`${endpoint}/videos`, {
     method: 'GET',
@@ -38,7 +38,7 @@ async function fetchPageApiVideo(credentials: PlatformCredentials): Promise<Fetc
   return { isTruncated, videos, cursor };
 }
 
-async function fetchPageCloudflare(credentials: PlatformCredentials): Promise<FetchPageResult> {
+export async function fetchPageCloudflare(credentials: PlatformCredentials): Promise<FetchPageResult> {
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream`, {
     headers: {
       Authorization: `Bearer ${credentials.secretKey}`,
@@ -52,7 +52,7 @@ async function fetchPageCloudflare(credentials: PlatformCredentials): Promise<Fe
   return { isTruncated, videos, cursor: null };
 }
 
-async function fetchPageVimeo(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
+export async function fetchPageVimeo(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
   const response = await fetch(`https://api.vimeo.com/me/videos?page=${page}`, {
     method: 'GET',
     headers: {
@@ -69,7 +69,7 @@ async function fetchPageVimeo(credentials: PlatformCredentials, page: number): P
   return { isTruncated, videos, cursor: null };
 }
 
-async function fetchPageWistia(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
+export async function fetchPageWistia(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
   const response = await fetch(`https://api.wistia.com/modern/medias?page=${page}`, {
     method: 'GET',
     headers: {
@@ -104,7 +104,7 @@ async function fetchPageS3(credentials: PlatformCredentials): Promise<FetchPageR
 
 // --- Fetch Video implementations ---
 
-async function fetchVideoApiVideo(credentials: PlatformCredentials, video: Video) {
+export async function fetchVideoApiVideo(credentials: PlatformCredentials, video: Video) {
   const endpoint = getApiVideoEndpoint(credentials);
   const response = await fetch(`${endpoint}/videos/${video.id}`, {
     method: 'GET',
@@ -120,7 +120,7 @@ async function fetchVideoApiVideo(credentials: PlatformCredentials, video: Video
   throw new Error('Only videos with MP4s enabled are supported at this time');
 }
 
-async function fetchVideoCloudflare(credentials: PlatformCredentials, video: Video) {
+export async function fetchVideoCloudflare(credentials: PlatformCredentials, video: Video) {
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream/${video.id}/downloads`,
     {
@@ -138,7 +138,7 @@ async function fetchVideoCloudflare(credentials: PlatformCredentials, video: Vid
   return { id: video.id, url: '', needsPolling: true };
 }
 
-async function fetchVideoVimeo(credentials: PlatformCredentials, video: Video) {
+export async function fetchVideoVimeo(credentials: PlatformCredentials, video: Video) {
   const response = await fetch(`https://api.vimeo.com${video.id}`, {
     method: 'GET',
     headers: {
@@ -156,7 +156,7 @@ async function fetchVideoVimeo(credentials: PlatformCredentials, video: Video) {
   return undefined;
 }
 
-async function fetchVideoWistia(_credentials: PlatformCredentials, video: Video) {
+export async function fetchVideoWistia(_credentials: PlatformCredentials, video: Video) {
   if (!video) throw new Error('Error fetching video from Wistia');
   return video;
 }
@@ -216,11 +216,10 @@ export async function fetchVideoStep(
   return fn(credentials, video);
 }
 
-export async function checkCloudflareStatusStep(
+export async function checkCloudflareStatus(
   credentials: PlatformCredentials,
   video: Video
 ): Promise<{ ready: boolean; url: string }> {
-  'use step';
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream/${video.id}/downloads`,
     {
@@ -236,6 +235,14 @@ export async function checkCloudflareStatusStep(
     ready: result.result.default.status === 'ready',
     url: result.result.default.url as string,
   };
+}
+
+export async function checkCloudflareStatusStep(
+  credentials: PlatformCredentials,
+  video: Video
+): Promise<{ ready: boolean; url: string }> {
+  'use step';
+  return checkCloudflareStatus(credentials, video);
 }
 
 export async function transferVideoStep(
