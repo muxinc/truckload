@@ -38,17 +38,20 @@ describe('Api.video provider', () => {
         }),
     });
 
-    const result = await fetchPageApiVideo({
-      publicKey: 'pub',
-      secretKey: 'secret',
-      additionalMetadata: { environment: 'sandbox' },
-    });
+    const result = await fetchPageApiVideo(
+      {
+        publicKey: 'pub',
+        secretKey: 'secret',
+        additionalMetadata: { environment: 'sandbox' },
+      },
+      1
+    );
 
     expect(result.videos).toHaveLength(2);
     expect(result.videos[0].id).toBe('v1');
     expect(result.isTruncated).toBe(false);
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://sandbox.api.video/videos',
+      'https://sandbox.api.video/videos?currentPage=1',
       expect.objectContaining({ method: 'GET' })
     );
   });
@@ -84,17 +87,20 @@ describe('Cloudflare Stream provider', () => {
       json: () =>
         Promise.resolve({
           result: [{ uid: 'cf-1' }, { uid: 'cf-2' }],
-          range: 0,
         }),
     });
 
-    const result = await fetchPageCloudflare({
-      publicKey: 'account-id',
-      secretKey: 'api-token',
-    });
+    const result = await fetchPageCloudflare(
+      {
+        publicKey: 'account-id',
+        secretKey: 'api-token',
+      },
+      1
+    );
 
     expect(result.videos).toHaveLength(2);
     expect(result.videos[0].id).toBe('cf-1');
+    expect(result.isTruncated).toBe(false);
   });
 
   it('fetchVideo returns ready video', async () => {

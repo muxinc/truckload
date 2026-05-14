@@ -19,9 +19,9 @@ type FetchPageResult = { isTruncated: boolean | undefined; videos: Video[]; curs
 
 // --- Fetch Page implementations ---
 
-export async function fetchPageApiVideo(credentials: PlatformCredentials): Promise<FetchPageResult> {
+export async function fetchPageApiVideo(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
   const endpoint = getApiVideoEndpoint(credentials);
-  const response = await fetch(`${endpoint}/videos`, {
+  const response = await fetch(`${endpoint}/videos?currentPage=${page}`, {
     method: 'GET',
     headers: {
       Authorization: `Basic ${btoa(credentials.secretKey as string)}`,
@@ -38,17 +38,21 @@ export async function fetchPageApiVideo(credentials: PlatformCredentials): Promi
   return { isTruncated, videos, cursor };
 }
 
-export async function fetchPageCloudflare(credentials: PlatformCredentials): Promise<FetchPageResult> {
-  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream`, {
-    headers: {
-      Authorization: `Bearer ${credentials.secretKey}`,
-      'Content-Type': 'application/json',
-    },
-  });
+export async function fetchPageCloudflare(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
+  const perPage = 50;
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream?page=${page}&per_page=${perPage}`,
+    {
+      headers: {
+        Authorization: `Bearer ${credentials.secretKey}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   const result = await response.json();
-  const isTruncated = result.range && result.range > 0;
   const videos =
     result.result?.map((obj: any) => ({ id: obj.uid })).filter((item: Video): item is Video => !!item.id) || [];
+  const isTruncated = videos.length >= perPage;
   return { isTruncated, videos, cursor: null };
 }
 
@@ -100,12 +104,16 @@ function getS3Credentials(credentials: PlatformCredentials) {
   return creds;
 }
 
-async function fetchPageS3(credentials: PlatformCredentials): Promise<FetchPageResult> {
+async function fetchPageS3(credentials: PlatformCredentials, _page: number, cursor?: string): Promise<FetchPageResult> {
   const client = new S3Client({
     credentials: getS3Credentials(credentials),
     region: credentials.additionalMetadata!.region,
   });
-  const results = await client.send(new ListObjectsV2Command({ Bucket: credentials.additionalMetadata!.bucket }));
+  const command: any = { Bucket: credentials.additionalMetadata!.bucket };
+  if (cursor) {
+    command.ContinuationToken = cursor;
+  }
+  const results = await client.send(new ListObjectsV2Command(command));
   const videos =
     results.Contents?.map((obj) => ({ id: obj.Key })).filter(
       (item): item is Video => !!item.id && /\.(mp4|mov|mp3)$/i.test(item.id)
@@ -187,7 +195,10 @@ async function fetchVideoS3(credentials: PlatformCredentials, video: Video) {
 
 // --- Provider dispatch maps ---
 
-const fetchPageFns: Record<string, (credentials: PlatformCredentials, page: number) => Promise<FetchPageResult>> = {
+const fetchPageFns: Record<
+  string,
+  (credentials: PlatformCredentials, page: number, cursor?: string) => Promise<FetchPageResult>
+> = {
   'api-video': fetchPageApiVideo,
   'cloudflare-stream': fetchPageCloudflare,
   vimeo: fetchPageVimeo,
@@ -208,12 +219,13 @@ const fetchVideoFns: Record<string, (credentials: PlatformCredentials, video: Vi
 export async function fetchPageStep(
   platformId: string,
   credentials: PlatformCredentials,
-  page: number
+  page: number,
+  cursor?: string
 ): Promise<FetchPageResult> {
   'use step';
   const fn = fetchPageFns[platformId];
   if (!fn) throw new Error(`Provider ${platformId} does not support fetchPage`);
-  return fn(credentials, page);
+  return fn(credentials, page, cursor);
 }
 
 export async function fetchVideoStep(

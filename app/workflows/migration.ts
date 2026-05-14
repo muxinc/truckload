@@ -68,14 +68,13 @@ export async function initiateMigration(data: {
 
   let hasMorePages = true;
   let page = 1;
+  let cursor: string | undefined;
   let videoList: Video[] = [];
 
   while (hasMorePages && data.sourcePlatform.credentials) {
-    const { cursor, isTruncated, videos } = await fetchPageStep(
-      data.sourcePlatform.id,
-      data.sourcePlatform.credentials,
-      page
-    );
+    const result = await fetchPageStep(data.sourcePlatform.id, data.sourcePlatform.credentials, page, cursor);
+    const { isTruncated, videos } = result;
+    cursor = result.cursor ?? undefined;
 
     videoList = videoList.concat(videos);
 
