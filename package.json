@@ -12,12 +12,11 @@
     "format": "prettier --write ./ && next lint --fix",
     "prepare": "husky install",
     "partykit": "cd app && npx partykit dev",
-    "ngrok": "ngrok http http://localhost:3000",
     "workflow:web": "npx workflow web",
     "workflow:inspect": "npx workflow inspect runs",
     "test": "vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "start:dev": "concurrently -c \"white,red,#022384\" --names \"NEXT.JS,PARTYKIT,NGROK\" \"npm run dev\" \"npm run partykit\" \"npm run ngrok\""
+    "start:dev": "concurrently -c \"white,red\" --names \"NEXT.JS,PARTYKIT\" \"npm run dev\" \"npm run partykit\""
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",

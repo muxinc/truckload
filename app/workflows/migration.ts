@@ -4,6 +4,7 @@ import type { DestinationPlatform, SourcePlatform, Video, VideoWithMigrationStat
 
 import {
   checkCloudflareStatusStep,
+  checkMuxAssetStatusStep,
   fetchPageStep,
   fetchVideoStep,
   startProcessVideoWorkflow,
@@ -36,8 +37,24 @@ export async function processVideo(
   }
 
   const transfer = await transferVideoStep(jobId, video, sourcePlatform, destinationPlatform);
+  const assetId = transfer.result.id;
 
-  return { status: 'success', transfer };
+  // Poll Mux until asset is ready (replaces webhook/ngrok approach)
+  let assetStatus = { ready: false, errored: false };
+  while (!assetStatus.ready && !assetStatus.errored) {
+    await sleep('5s');
+    assetStatus = await checkMuxAssetStatusStep(destinationPlatform.credentials!, assetId);
+  }
+
+  await updateJobStatusStep(jobId, 'migration.video.progress', {
+    video: {
+      id: videoData.id,
+      status: assetStatus.ready ? 'completed' : 'failed',
+      progress: 100,
+    },
+  });
+
+  return { status: assetStatus.ready ? 'success' : 'failed', transfer };
 }
 
 export async function initiateMigration(data: {

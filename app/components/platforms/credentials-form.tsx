@@ -42,6 +42,12 @@ const PLATFORM_CREDENTIALS = [
         name: 'bucket',
         type: 'text',
       },
+      {
+        label: 'Session Token (optional, for temporary credentials)',
+        name: 'sessionToken',
+        type: 'text',
+        required: false,
+      },
     ],
   },
   {
@@ -187,7 +193,7 @@ export default function PlatformCredentialsForm() {
                   id={value.name}
                   name={value.name}
                   type="text"
-                  required
+                  required={value.required !== false}
                   className="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               )}

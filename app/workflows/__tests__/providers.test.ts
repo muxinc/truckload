@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   checkCloudflareStatus,
+  checkMuxAssetStatus,
   fetchPageApiVideo,
   fetchPageCloudflare,
   fetchPageVimeo,
@@ -177,6 +178,50 @@ describe('Vimeo provider', () => {
       url: 'https://vimeo.com/download/1.mp4',
       title: 'My Video',
     });
+  });
+});
+
+describe('Mux asset status', () => {
+  it('checkMuxAssetStatus returns ready when asset is ready', async () => {
+    mockFetch.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          data: { id: 'asset-1', status: 'ready', playback_ids: [{ id: 'pid-1' }] },
+        }),
+    });
+
+    const result = await checkMuxAssetStatus({ publicKey: 'token-id', secretKey: 'token-secret' }, 'asset-1');
+
+    expect(result.ready).toBe(true);
+    expect(result.errored).toBe(false);
+  });
+
+  it('checkMuxAssetStatus returns errored when asset has errored', async () => {
+    mockFetch.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          data: { id: 'asset-1', status: 'errored' },
+        }),
+    });
+
+    const result = await checkMuxAssetStatus({ publicKey: 'token-id', secretKey: 'token-secret' }, 'asset-1');
+
+    expect(result.ready).toBe(false);
+    expect(result.errored).toBe(true);
+  });
+
+  it('checkMuxAssetStatus returns not ready when asset is preparing', async () => {
+    mockFetch.mockResolvedValueOnce({
+      json: () =>
+        Promise.resolve({
+          data: { id: 'asset-1', status: 'preparing' },
+        }),
+    });
+
+    const result = await checkMuxAssetStatus({ publicKey: 'token-id', secretKey: 'token-secret' }, 'asset-1');
+
+    expect(result.ready).toBe(false);
+    expect(result.errored).toBe(false);
   });
 });
 

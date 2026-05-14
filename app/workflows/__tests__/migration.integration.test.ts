@@ -31,7 +31,7 @@ afterEach(() => {
 });
 
 describe('processVideo workflow', () => {
-  it('should fetch and transfer a video (api-video source, mux destination)', async () => {
+  it('should fetch, transfer, and poll until asset ready (api-video source, mux destination)', async () => {
     // Mock api.video fetchVideo
     nock('https://sandbox.api.video')
       .get('/videos/v1')
@@ -45,6 +45,19 @@ describe('processVideo workflow', () => {
       .post('/video/v1/assets')
       .reply(200, {
         data: { id: 'mux-asset-1', status: 'preparing', playback_ids: [] },
+      });
+
+    // Mock Mux asset status poll (first: preparing, second: ready)
+    nock('https://api.mux.com')
+      .get('/video/v1/assets/mux-asset-1')
+      .reply(200, {
+        data: { id: 'mux-asset-1', status: 'preparing', playback_ids: [] },
+      });
+
+    nock('https://api.mux.com')
+      .get('/video/v1/assets/mux-asset-1')
+      .reply(200, {
+        data: { id: 'mux-asset-1', status: 'ready', playback_ids: [{ id: 'pid-1' }] },
       });
 
     const run = await start(processVideo, [
@@ -69,6 +82,13 @@ describe('processVideo workflow', () => {
       },
       { id: 'v1', title: 'Test Video' },
     ]);
+
+    // Wake up the sleep calls (5s polling delays for Mux asset status)
+    const sleepId1 = await waitForSleep(run);
+    await getRun(run.runId).wakeUp({ correlationIds: [sleepId1] });
+
+    const sleepId2 = await waitForSleep(run);
+    await getRun(run.runId).wakeUp({ correlationIds: [sleepId2] });
 
     const result = await run.returnValue;
     expect(result.status).toBe('success');
@@ -100,7 +120,14 @@ describe('processVideo workflow', () => {
     nock('https://api.mux.com')
       .post('/video/v1/assets')
       .reply(200, {
-        data: { id: 'mux-asset-1', status: 'preparing', playback_ids: [] },
+        data: { id: 'mux-asset-2', status: 'preparing', playback_ids: [] },
+      });
+
+    // Mock Mux asset status poll (immediately ready)
+    nock('https://api.mux.com')
+      .get('/video/v1/assets/mux-asset-2')
+      .reply(200, {
+        data: { id: 'mux-asset-2', status: 'ready', playback_ids: [{ id: 'pid-2' }] },
       });
 
     const run = await start(processVideo, [
@@ -122,12 +149,16 @@ describe('processVideo workflow', () => {
       { id: 'cf-1' },
     ]);
 
-    // Wake up the sleep calls (5s polling delays)
+    // Wake up Cloudflare polling sleeps
     const sleepId1 = await waitForSleep(run);
     await getRun(run.runId).wakeUp({ correlationIds: [sleepId1] });
 
     const sleepId2 = await waitForSleep(run);
     await getRun(run.runId).wakeUp({ correlationIds: [sleepId2] });
+
+    // Wake up Mux asset status polling sleep
+    const sleepId3 = await waitForSleep(run);
+    await getRun(run.runId).wakeUp({ correlationIds: [sleepId3] });
 
     const result = await run.returnValue;
     expect(result.status).toBe('success');

@@ -89,9 +89,20 @@ export async function fetchPageWistia(credentials: PlatformCredentials, page: nu
   return { videos, isTruncated: result.length !== 0, cursor: null };
 }
 
+function getS3Credentials(credentials: PlatformCredentials) {
+  const creds: any = {
+    accessKeyId: credentials.publicKey,
+    secretAccessKey: credentials.secretKey!,
+  };
+  if (credentials.additionalMetadata?.sessionToken) {
+    creds.sessionToken = credentials.additionalMetadata.sessionToken;
+  }
+  return creds;
+}
+
 async function fetchPageS3(credentials: PlatformCredentials): Promise<FetchPageResult> {
   const client = new S3Client({
-    credentials: { accessKeyId: credentials.publicKey, secretAccessKey: credentials.secretKey! },
+    credentials: getS3Credentials(credentials),
     region: credentials.additionalMetadata!.region,
   });
   const results = await client.send(new ListObjectsV2Command({ Bucket: credentials.additionalMetadata!.bucket }));
@@ -163,7 +174,7 @@ export async function fetchVideoWistia(_credentials: PlatformCredentials, video:
 
 async function fetchVideoS3(credentials: PlatformCredentials, video: Video) {
   const client = new S3Client({
-    credentials: { accessKeyId: credentials.publicKey, secretAccessKey: credentials.secretKey! },
+    credentials: getS3Credentials(credentials),
     region: credentials.additionalMetadata!.region,
   });
   const url = await getSignedUrl(
@@ -243,6 +254,31 @@ export async function checkCloudflareStatusStep(
 ): Promise<{ ready: boolean; url: string }> {
   'use step';
   return checkCloudflareStatus(credentials, video);
+}
+
+export async function checkMuxAssetStatus(
+  credentials: PlatformCredentials,
+  assetId: string
+): Promise<{ ready: boolean; errored: boolean }> {
+  const response = await fetch(`https://api.mux.com/video/v1/assets/${assetId}`, {
+    headers: {
+      Authorization: `Basic ${btoa(`${credentials.publicKey}:${credentials.secretKey}`)}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  const result = await response.json();
+  return {
+    ready: result.data.status === 'ready',
+    errored: result.data.status === 'errored',
+  };
+}
+
+export async function checkMuxAssetStatusStep(
+  credentials: PlatformCredentials,
+  assetId: string
+): Promise<{ ready: boolean; errored: boolean }> {
+  'use step';
+  return checkMuxAssetStatus(credentials, assetId);
 }
 
 export async function transferVideoStep(
