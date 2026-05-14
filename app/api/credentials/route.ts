@@ -66,11 +66,15 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Invalid credentials' }, { status: 401 });
       }
     case 's3':
+      const s3Credentials: any = {
+        accessKeyId: data.publicKey,
+        secretAccessKey: data.secretKey!,
+      };
+      if (data.additionalMetadata?.sessionToken) {
+        s3Credentials.sessionToken = data.additionalMetadata.sessionToken;
+      }
       const client = new S3Client({
-        credentials: {
-          accessKeyId: data.publicKey,
-          secretAccessKey: data.secretKey!,
-        },
+        credentials: s3Credentials,
         region: data.additionalMetadata.region,
       });
 

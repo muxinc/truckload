@@ -49,9 +49,7 @@ export default function MigrationStatus() {
     <div>
       <Heading>Migration Status</Heading>
       {/* {job?.status} */}
-      <p className="text-xs mb-2">
-        Note: this page will only update if you&apos;ve correctly configured status webhooks.
-      </p>
+      <p className="text-xs mb-2">Note: this page updates in real-time as videos are processed.</p>
 
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">

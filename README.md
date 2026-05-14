@@ -26,19 +26,19 @@ Finally, start the app:
 npm run start:dev
 ```
 
-This will start server instances for the Next.js app, Inngest, PartyKit, and ngrok.
+This will start server instances for the Next.js app and PartyKit.
 
 <img src="public/stack.png" alt="Truckload stack" width="600px">
 
-### About the Inngest server
+### About Workflow
 
-[Inngest](https://www.inngest.com) makes serverless queues, background jobs, and workflows effortless. Truckload uses a [local Inngest development server](https://www.inngest.com/docs/local-development) to facilitate the loading and migrating of each video.
+Truckload uses the [Vercel Workflow SDK](https://vercel.com/docs/workflow) to orchestrate video migration jobs. Workflows and steps are defined using `'use workflow'` and `'use step'` directives. In development, workflows run locally via the built-in workflow runtime.
 
 ### About the PartyKit server
 
 [PartyKit](https://www.partykit.io/) is a comprehensive solution for real-time sync within your application.
 
-In this app, we're really only using it to receive status updates from the video migration background jobs and destination webhooks. Truckload uses a local PartyKit server on port `1999` to receive these notifications and pipe them back to the front-end for status updates.
+In this app, we're using it to receive status updates from the video migration background jobs. Truckload uses a local PartyKit server on port `1999` to receive these notifications and pipe them back to the front-end for status updates.
 
 ## How it works
 
@@ -60,19 +60,6 @@ Here's a list of the authentication requirements for each service:
 | Vimeo             | [Access Token](https://developer.vimeo.com/api/authentication#obtaining-an-access-token)                                                               | [API docs](https://developer.vimeo.com/api/)                                             |
 | Mux               | [Token ID and Secret](https://docs.mux.com/core/make-api-requests#http-basic-auth)                                                                     | [API docs](https://docs.mux.com/api-reference)                                           |
 
-## Handling webhooks
+## How asset status is tracked
 
-Some destinations (like [Mux](https://mux.com?utm_source=github&utm_medium=readme&utm_campaign=truckload)) use webhooks to communicate migration progress to your application.
-
-This presents a challenge when you're running this app locally, as you'll need a public URL that can
-be reached by an HTTP request issued by your destination service.
-
-To solve this, you can stand up a free, publicly-accessible tunnel URL using ngrok. Here's how:
-
-1. Visit https://ngrok.com
-2. Sign in with your existing account or with GitHub
-3. Follow the instructions to install and authenticate `ngrok` on your machine
-4. Create an `ngrok` endpoint for your local app by running `ngrok http http://localhost:3000`
-5. Grab the resulting URL for use as your webhook destination, and append `/api/webhooks/mux`:
-
-<img src="public/screenshots/ngrok-url.png" alt="Ngrok URL" width="600px">
+After transferring a video to Mux, the workflow polls the Mux API until the asset status is `ready` (or `errored`). This eliminates the need for webhooks and ngrok tunnels during local development.

@@ -1,5 +1,5 @@
-import { PRODUCTION_ENDPOINT, SANDBOX_ENDPOINT } from '@/inngest/providers/api-video/constants';
 import type { PlatformCredentials } from '@/utils/store';
+import { PRODUCTION_ENDPOINT, SANDBOX_ENDPOINT } from '@/workflows/providers/api-video/constants';
 
 export default async function validate(data: PlatformCredentials) {
   const endpoint = data.additionalMetadata?.environment === 'sandbox' ? SANDBOX_ENDPOINT : PRODUCTION_ENDPOINT;
