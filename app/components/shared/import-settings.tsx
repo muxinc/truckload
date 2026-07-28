@@ -42,7 +42,7 @@ const PLATFORM_METADATA_FIELDS: { id: string; fields: Field[] }[] = [
         docsUrl: 'https://docs.mux.com/guides/stream-videos-in-4k',
         name: 'maxResolutionTier',
         type: 'select',
-        values: (config) => (config.videoQuality === 'basic' ? ['1080p'] : ['1080p', '1440p', '2160p']),
+        values: ['1080p', '1440p', '2160p'],
       },
       {
         label: 'Auto-generate captions',
