@@ -26,7 +26,7 @@ export default function Page() {
       useMigrationStore.setState({ currentStep: 'select-source' });
     } else if (!sourcePlatform?.credentials) {
       useMigrationStore.setState({ currentStep: 'set-source-credentials' });
-    } else if (sourcePlatform?.credentials && !useMigrationStore.getState().assetFilter) {
+    } else if (sourcePlatform?.credentials && useMigrationStore.getState().assetFilter === null) {
       useMigrationStore.setState({ currentStep: 'set-video-filter' });
     } else if (!destinationPlatform) {
       useMigrationStore.setState({ currentStep: 'select-destination' });
