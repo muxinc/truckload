@@ -13,6 +13,8 @@ export default function Sidebar() {
   const assetFilter = useMigrationStore((state) => state.assetFilter);
   const setAssetFilter = useMigrationStore((state) => state.setAssetFilter);
 
+  const isManualSelection = assetFilter === false;
+
   const state = useMigrationStore.getState();
 
   console.dir(state);
@@ -92,7 +94,7 @@ export default function Sidebar() {
           <div className="flex justify-between border-b border-slate-200 pb-2">
             <div className="flex flex-col">
               <h3 className="font-semibold text-sm">Video selection</h3>
-              <p className="text-sm">Moving all videos</p>
+              <p className="text-sm">{isManualSelection ? 'Choose videos in status page' : 'Moving all videos'}</p>
             </div>
 
             <button

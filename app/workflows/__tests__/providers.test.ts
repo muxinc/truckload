@@ -153,8 +153,22 @@ describe('Vimeo provider', () => {
           page: 1,
           per_page: 25,
           data: [
-            { uri: '/videos/1', name: 'V1', status: 'available', type: 'video' },
-            { uri: '/videos/2', name: 'V2', status: 'available', type: 'video' },
+            {
+              uri: '/videos/1',
+              name: 'V1',
+              status: 'available',
+              type: 'video',
+              duration: 65,
+              pictures: { sizes: [{ link: 'https://i.vimeocdn.com/video/1_100x75.jpg' }] },
+            },
+            {
+              uri: '/videos/2',
+              name: 'V2',
+              status: 'available',
+              type: 'video',
+              duration: 3700,
+              pictures: { base_link: 'https://i.vimeocdn.com/video/2_base.jpg' },
+            },
           ],
         }),
     });
@@ -162,6 +176,16 @@ describe('Vimeo provider', () => {
     const result = await fetchPageVimeo({ publicKey: '', secretKey: 'token' }, 1);
 
     expect(result.videos).toHaveLength(2);
+    expect(result.videos[0]).toMatchObject({
+      id: '/videos/1',
+      thumbnailUrl: 'https://i.vimeocdn.com/video/1_100x75.jpg',
+      durationSeconds: 65,
+    });
+    expect(result.videos[1]).toMatchObject({
+      id: '/videos/2',
+      thumbnailUrl: 'https://i.vimeocdn.com/video/2_base.jpg',
+      durationSeconds: 3700,
+    });
     expect(result.isTruncated).toBe(false);
   });
 
@@ -173,6 +197,13 @@ describe('Vimeo provider', () => {
           name: 'My Video',
           status: 'available',
           type: 'video',
+          duration: 3723,
+          pictures: {
+            sizes: [
+              { width: 100, link: 'https://i.vimeocdn.com/video/small.jpg' },
+              { width: 1280, link: 'https://i.vimeocdn.com/video/large.jpg' },
+            ],
+          },
           download: [{ rendition: 'source', link: 'https://vimeo.com/download/1.mp4' }],
         }),
     });
@@ -183,6 +214,8 @@ describe('Vimeo provider', () => {
       id: '/videos/1',
       url: 'https://vimeo.com/download/1.mp4',
       title: 'My Video',
+      thumbnailUrl: 'https://i.vimeocdn.com/video/large.jpg',
+      durationSeconds: 3723,
     });
   });
 });

@@ -53,7 +53,7 @@
     "autoprefixer": "^10.4.17",
     "concurrently": "^8.2.2",
     "nock": "^14.0.15",
-    "partykit": "0.0.93",
+    "partykit": "^0.0.115",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.21.0",

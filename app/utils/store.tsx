@@ -28,6 +28,7 @@ export type MigrationVideosFetchedEvent = {
 export type MigrationStatus = {
   status: 'pending' | 'in-progress' | 'retrying' | 'completed' | 'failed';
   progress: number;
+  error?: string;
 };
 
 export type Video = {
@@ -35,6 +36,7 @@ export type Video = {
   url?: string | undefined;
   title?: string | undefined;
   thumbnailUrl?: string | undefined;
+  durationSeconds?: number | undefined;
 };
 
 export type VideoWithMigrationStatus = Video & MigrationStatus;
@@ -71,19 +73,19 @@ interface Platform {
   config?: PlatformConfig | undefined;
 }
 
-export type AssetFilter = {
-  url: string;
-};
+export type AssetFilter = boolean;
 
 export type MigrationJob = {
   id: string;
   status: 'pending' | 'in-progress' | 'completed' | 'failed';
   progress: number;
   videos: Record<string, VideoWithMigrationStatus>;
+  halted?: boolean;
+  haltReason?: string;
 };
 
 type MigrationActions = {
-  setAssetFilter: (filter: AssetFilter[] | null) => void;
+  setAssetFilter: (filter: AssetFilter | null) => void;
   setPlatform: <T extends PlatformType>(
     type: T,
     platform: T extends 'source' ? SourcePlatform | null : DestinationPlatform | null
@@ -95,7 +97,7 @@ type MigrationActions = {
 interface MigrationState {
   sourcePlatform: SourcePlatform | null;
   destinationPlatform: DestinationPlatform | null;
-  assetFilter: AssetFilter[] | null;
+  assetFilter: AssetFilter | null;
   job: MigrationJob | null;
   currentStep: MigrationStep;
 }
@@ -124,7 +126,7 @@ const useMigrationStore = create<MigrationState & MigrationActions>()(
         setCurrentStep: (step: MigrationStep) => {
           set({ currentStep: step });
         },
-        setAssetFilter: (filter: AssetFilter[] | null) => {
+        setAssetFilter: (filter: AssetFilter | null) => {
           set({ assetFilter: filter });
         },
         setPlatform: <T extends PlatformType>(
@@ -140,7 +142,8 @@ const useMigrationStore = create<MigrationState & MigrationActions>()(
         setVideoMigrationProgress: (id: string, status: VideoWithMigrationStatus) => {
           set((state) => {
             if (state.job) {
-              state.job.videos[id] = status;
+              const existing = state.job.videos[id];
+              state.job.videos[id] = existing ? { ...existing, ...status } : status;
             }
           });
         },

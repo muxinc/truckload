@@ -17,6 +17,24 @@ function getApiVideoEndpoint(credentials: PlatformCredentials) {
 
 type FetchPageResult = { isTruncated: boolean | undefined; videos: Video[]; cursor: string | null | undefined };
 
+function getVimeoThumbnailUrl(video: any): string | undefined {
+  if (Array.isArray(video?.pictures?.sizes) && video.pictures.sizes.length > 0) {
+    const largest = video.pictures.sizes[video.pictures.sizes.length - 1];
+    if (typeof largest?.link === 'string' && largest.link.trim().length > 0) return largest.link;
+  }
+
+  if (typeof video?.pictures?.base_link === 'string' && video.pictures.base_link.trim().length > 0) {
+    return video.pictures.base_link;
+  }
+
+  return undefined;
+}
+
+function getVimeoDurationSeconds(video: any): number | undefined {
+  if (typeof video?.duration !== 'number' || !Number.isFinite(video.duration) || video.duration < 0) return undefined;
+  return Math.floor(video.duration);
+}
+
 // --- Fetch Page implementations ---
 
 export async function fetchPageApiVideo(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
@@ -68,8 +86,15 @@ export async function fetchPageVimeo(credentials: PlatformCredentials, page: num
   const isTruncated = result.page < Math.ceil(result.total / result.per_page);
   const videos =
     result.data
-      ?.map((obj: any) => ({ id: obj.uri, title: obj.name, status: obj.status, type: obj.type }))
-      .filter((item: any): item is Video => !!item.id && !(item.status !== 'available' && item.type !== 'video')) || [];
+      ?.map((obj: any) => ({
+        id: obj.uri,
+        title: obj.name,
+        thumbnailUrl: getVimeoThumbnailUrl(obj),
+        durationSeconds: getVimeoDurationSeconds(obj),
+        status: obj.status,
+        type: obj.type,
+      }))
+      .filter((item: any): item is Video => !!item.id && item.status === 'available' && item.type === 'video') || [];
   return { isTruncated, videos, cursor: null };
 }
 
@@ -165,14 +190,29 @@ export async function fetchVideoVimeo(credentials: PlatformCredentials, video: V
       'Content-Type': 'application/json',
     },
   });
+  if (typeof response.ok === 'boolean' && !response.ok) {
+    throw new Error(`Vimeo API request failed for ${video.id} with status ${response.status}`);
+  }
+
   const result = await response.json();
   if (!result) throw new Error('Error fetching video from Vimeo');
   if (result.download && result.status === 'available' && result.type === 'video') {
     const renditions = ['source', '8k', '7k', '6k', '5k', '4k', '2k', '1080p', '720p', '540p', '480p', '360p', '240p'];
     const download = result.download.find((f: any) => renditions.includes(f.rendition));
-    return { id: video.id, url: download?.link, title: result?.name };
+    if (!download?.link) {
+      throw new Error(`Vimeo video ${video.id} has no supported downloadable rendition`);
+    }
+    return {
+      id: video.id,
+      url: download?.link,
+      title: result?.name,
+      thumbnailUrl: getVimeoThumbnailUrl(result),
+      durationSeconds: getVimeoDurationSeconds(result),
+    };
   }
-  return undefined;
+  throw new Error(
+    `Vimeo video ${video.id} is not available for download (status=${result.status}, type=${result.type})`
+  );
 }
 
 export async function fetchVideoWistia(_credentials: PlatformCredentials, video: Video) {
@@ -351,6 +391,22 @@ export async function updateJobStatusStep(jobId: string, eventType: string, data
     body: JSON.stringify({ id: jobId, type: eventType, data }),
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export async function getJobHaltStatusStep(jobId: string): Promise<{ halted: boolean; reason?: string }> {
+  'use step';
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_PARTYKIT_URL}/party/${jobId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    return { halted: false };
+  }
+
+  const job = (await response.json()) as { halted?: boolean; haltReason?: string };
+  return { halted: !!job.halted, reason: job.haltReason };
 }
 
 export async function startProcessVideoWorkflow(
