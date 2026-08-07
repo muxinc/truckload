@@ -119,21 +119,23 @@ export default function MigrationStatus() {
         throw new Error(errorBody.error || 'Failed to enqueue upload start');
       }
 
+      setSelectedIds((prev) => prev.filter((id) => !ids.includes(id)));
+      toast.success(`Started ${videos.length} upload${videos.length > 1 ? 's' : ''}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start uploads';
+
       for (const video of videos) {
         const current = useMigrationStore.getState().job?.videos[video.id];
         if (!current) continue;
         setVideoMigrationProgress(video.id, {
           ...current,
-          status: 'in-progress',
-          progress: current.progress || 0,
-          error: '',
+          status: 'failed',
+          progress: 100,
+          error: errorMessage,
         });
       }
 
-      setSelectedIds((prev) => prev.filter((id) => !ids.includes(id)));
-      toast.success(`Started ${videos.length} upload${videos.length > 1 ? 's' : ''}`);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to start uploads');
+      toast.error(errorMessage);
     } finally {
       setStartingIds((prev) => {
         const next = { ...prev };

@@ -6,6 +6,18 @@ import { initiateMigration, processVideo, refreshVideoList } from '@/workflows/m
 
 export const dynamic = 'force-dynamic';
 
+async function fetchPartyKitJob(jobId: string): Promise<Response> {
+  const partyKitUrl = process.env.NEXT_PUBLIC_PARTYKIT_URL;
+  if (!partyKitUrl) {
+    throw new Error('NEXT_PUBLIC_PARTYKIT_URL is not configured');
+  }
+
+  return fetch(`${partyKitUrl}/party/${jobId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 export async function GET(request: Request) {
   return new Response('Hello, World!', { status: 200 });
 }
@@ -16,7 +28,12 @@ export async function POST(request: Request) {
   const run = await start(initiateMigration, [body]);
   const jobId = run.runId;
 
-  await createJob(jobId);
+  try {
+    await createJob(jobId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to initialize migration job';
+    return Response.json({ error: message }, { status: 503 });
+  }
 
   return new Response(JSON.stringify({ id: jobId }), { status: 201 });
 }
@@ -44,6 +61,25 @@ export async function PATCH(request: Request) {
       { error: 'jobId, sourcePlatform, destinationPlatform, and videos are required' },
       { status: 400 }
     );
+  }
+
+  try {
+    const partyKitResponse = await fetchPartyKitJob(body.jobId);
+    if (partyKitResponse.status === 404) {
+      return Response.json(
+        { error: 'Migration job was not found. Restart PartyKit and create a new migration job.' },
+        { status: 409 }
+      );
+    }
+
+    if (!partyKitResponse.ok) {
+      return Response.json(
+        { error: `PartyKit returned ${partyKitResponse.status}. Start PartyKit and retry.` },
+        { status: 503 }
+      );
+    }
+  } catch {
+    return Response.json({ error: 'PartyKit is unavailable. Start PartyKit and retry.' }, { status: 503 });
   }
 
   const runIds: string[] = [];

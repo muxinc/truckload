@@ -142,7 +142,8 @@ const useMigrationStore = create<MigrationState & MigrationActions>()(
         setVideoMigrationProgress: (id: string, status: VideoWithMigrationStatus) => {
           set((state) => {
             if (state.job) {
-              state.job.videos[id] = status;
+              const existing = state.job.videos[id];
+              state.job.videos[id] = existing ? { ...existing, ...status } : status;
             }
           });
         },
