@@ -38,10 +38,20 @@ export async function fetchPageApiVideo(credentials: PlatformCredentials, page: 
   return { isTruncated, videos, cursor };
 }
 
-export async function fetchPageCloudflare(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
+export async function fetchPageCloudflare(
+  credentials: PlatformCredentials,
+  page: number,
+  cursor?: string
+): Promise<FetchPageResult> {
+  // Cloudflare Stream's list endpoint doesn't support page/per_page offset pagination
+  // (it always returns the same up-to-1000 most recent videos). Instead we page through
+  // videos in ascending creation order using `after`, cursoring on the last video's
+  // `created` timestamp.
   const perPage = 50;
+  const params = new URLSearchParams({ per_page: String(perPage), asc: 'true' });
+  if (cursor) params.set('after', cursor);
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream?page=${page}&per_page=${perPage}`,
+    `https://api.cloudflare.com/client/v4/accounts/${credentials.publicKey}/stream?${params.toString()}`,
     {
       headers: {
         Authorization: `Bearer ${credentials.secretKey}`,
@@ -50,10 +60,11 @@ export async function fetchPageCloudflare(credentials: PlatformCredentials, page
     }
   );
   const result = await response.json();
-  const videos =
-    result.result?.map((obj: any) => ({ id: obj.uid })).filter((item: Video): item is Video => !!item.id) || [];
+  const rawVideos: any[] = result.result || [];
+  const videos = rawVideos.map((obj: any) => ({ id: obj.uid })).filter((item: Video): item is Video => !!item.id);
   const isTruncated = videos.length >= perPage;
-  return { isTruncated, videos, cursor: null };
+  const nextCursor = isTruncated ? rawVideos[rawVideos.length - 1]?.created : null;
+  return { isTruncated, videos, cursor: nextCursor };
 }
 
 export async function fetchPageVimeo(credentials: PlatformCredentials, page: number): Promise<FetchPageResult> {
