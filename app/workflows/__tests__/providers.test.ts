@@ -103,6 +103,28 @@ describe('Cloudflare Stream provider', () => {
     expect(result.isTruncated).toBe(false);
   });
 
+  it('fetchPage requests ascending order with an after cursor, and returns the next cursor when truncated', async () => {
+    const fullPage = Array.from({ length: 50 }, (_, i) => ({
+      uid: `cf-${i}`,
+      created: `2024-01-01T00:00:${String(i).padStart(2, '0')}Z`,
+    }));
+    mockFetch.mockResolvedValueOnce({
+      json: () => Promise.resolve({ result: fullPage }),
+    });
+
+    const result = await fetchPageCloudflare(
+      { publicKey: 'account-id', secretKey: 'api-token' },
+      1,
+      '2023-12-31T00:00:00Z'
+    );
+
+    const requestedUrl = mockFetch.mock.calls[0][0] as string;
+    expect(requestedUrl).toContain('asc=true');
+    expect(requestedUrl).toContain('after=2023-12-31T00%3A00%3A00Z');
+    expect(result.isTruncated).toBe(true);
+    expect(result.cursor).toBe('2024-01-01T00:00:49Z');
+  });
+
   it('fetchVideo returns ready video', async () => {
     mockFetch.mockResolvedValueOnce({
       json: () =>
